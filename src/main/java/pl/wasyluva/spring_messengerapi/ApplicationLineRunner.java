@@ -3,23 +3,21 @@ package pl.wasyluva.spring_messengerapi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import pl.wasyluva.spring_messengerapi.data.repository.AccountRepository;
 import pl.wasyluva.spring_messengerapi.domain.userdetails.Account;
 import pl.wasyluva.spring_messengerapi.domain.userdetails.UserAuthority;
 
 import java.util.Arrays;
 
+@Profile("dev")
 @Configuration
 public class ApplicationLineRunner implements CommandLineRunner {
 	@Autowired
 	private AccountRepository accountRepository;
-	@Autowired
-	private String localHostUrl;
 
     @Override
     public void run(String... args) {
-		// print local URL of the running API server
-		System.out.println(">>>>>>>>>>>>> APP IS RUNNING UNDER THE FOLLOWING URL >>>>>>>>>>>>>>> " + localHostUrl);
 		// create and persist the admin Account if it does not exist
         if (accountRepository.findAll().stream().noneMatch((account ->
 				account.getUsername().equals("admin")))) {
