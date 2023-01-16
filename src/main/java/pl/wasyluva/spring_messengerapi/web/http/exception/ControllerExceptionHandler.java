@@ -3,6 +3,7 @@ package pl.wasyluva.spring_messengerapi.web.http.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,5 +27,10 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<?> handleMaxUploadSizeExceededException(){
         return new ServiceResponse<>(PAYLOAD_TOO_LARGE, HttpStatus.PAYLOAD_TOO_LARGE).getResponseEntity();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(){
+        return new ServiceResponse<>(UNAUTHORIZED, HttpStatus.UNAUTHORIZED).getResponseEntity();
     }
 }

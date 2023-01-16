@@ -19,6 +19,9 @@ public class PrincipalService {
 
     public UUID getPrincipalAccountId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof Account))
+            return null;
+
         return ((Account) authentication.getPrincipal()).getId();
     }
 

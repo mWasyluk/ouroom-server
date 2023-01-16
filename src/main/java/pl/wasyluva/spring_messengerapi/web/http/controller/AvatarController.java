@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/images/avatars")
+@RequestMapping("${apiPrefix}/images/avatars")
 public class AvatarController {
     private final AvatarService avatarService;
     private final PrincipalService principalService;

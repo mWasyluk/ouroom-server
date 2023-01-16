@@ -24,7 +24,6 @@ import java.util.UUID;
 public class AccountService implements UserDetailsService {
     private final AccountRepository accountRepository;
 
-    // TODO: Remove after tests
     public ServiceResponse<?> getAllAccounts() {
         return new ServiceResponse<List<Account>>(accountRepository.findAll(), HttpStatus.OK);
     }
@@ -41,7 +40,11 @@ public class AccountService implements UserDetailsService {
     }
 
     // TODO: test
-    public ServiceResponse<?> getAccountById(@NonNull UUID requestingAccountUuid){
+    public ServiceResponse<?> getAccountById(UUID requestingAccountUuid){
+        if (requestingAccountUuid == null) {
+            return ServiceResponse.NOT_FOUND;
+        }
+
         Optional<Account> byId = accountRepository.findById(requestingAccountUuid);
         if (!byId.isPresent()){
             return ServiceResponse.INCORRECT_ID;

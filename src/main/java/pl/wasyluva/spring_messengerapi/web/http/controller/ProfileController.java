@@ -9,17 +9,10 @@ import pl.wasyluva.spring_messengerapi.web.http.support.PrincipalService;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/profiles")
+@RequestMapping("${apiPrefix}/profiles")
 public class ProfileController {
-    // TODO: Return more self-descriptive HTTP status codes
-
     private final ProfileService profileService;
     private final PrincipalService principalService;
-
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllUserProfiles(){
-        return profileService.getAllProfiles().getResponseEntity();
-    }
 
     @GetMapping
     public ResponseEntity<?> getPrincipalProfile(){

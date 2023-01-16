@@ -11,19 +11,10 @@ import pl.wasyluva.spring_messengerapi.web.http.support.PrincipalService;
 @RequiredArgsConstructor
 
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("${apiPrefix}/accounts")
 public class AccountController {
-    // TODO: Create method to register account with more Authorities than 'USER'
-    //  The method should be secured with IP and user authorities check (whitelisted IP and 'ADMIN' authority)
-
     private final AccountService accountService;
     private final PrincipalService principalService;
-
-    // TODO: Remove after tests
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllAccounts(){
-        return accountService.getAllAccounts().getResponseEntity();
-    }
 
     @GetMapping
     public ResponseEntity<?> getAccount(){

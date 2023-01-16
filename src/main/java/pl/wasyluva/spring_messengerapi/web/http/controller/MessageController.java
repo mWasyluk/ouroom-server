@@ -18,24 +18,14 @@ import java.util.Date;
 
 @Slf4j
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("${apiPrefix}/messages")
 @RequiredArgsConstructor
 public class MessageController {
-    // TODO: Find messages only for an actual Principal
-    // TODO: Find messages by a targetUserId as a request parameter
-
     private final MessageService messageService;
     private final ConversationService conversationService;
     private final PrincipalService principalService;
     private final MessagingTemplate messagingTemplate;
 
-    // TODO: Remove after tests
-    @GetMapping
-    public ResponseEntity<?> getAllMessages(){
-        return messageService.getAllPersistedMessages().getResponseEntity();
-    }
-
-    // PostMapping ("/send/user/{id}
     @PostMapping("/send/conversation/{conversationIdAsString}")
     public ResponseEntity<?> addMessageToConversation(@PathVariable String conversationIdAsString,
                                                              @RequestBody Message.TempMessage message) throws JsonProcessingException {

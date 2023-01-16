@@ -20,17 +20,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 
 @RestController
-@RequestMapping("/conversations")
+@RequestMapping("${apiPrefix}/conversations")
 public class ConversationController {
     private final ConversationService conversationService;
     private final ProfileService profileService;
     private final PrincipalService principalService;
     private final MessagingTemplate messagingTemplate;
-
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllConversations(){
-        return conversationService.getAll().getResponseEntity();
-    }
 
     @GetMapping
     public ResponseEntity<?> getAllParticipatorConversations(){
@@ -47,9 +42,6 @@ public class ConversationController {
                 .getResponseEntity();
 
     }
-
-    // TODO: Object with already existing Conversation should be send in response only when the request
-    //      is sent by any of participators
 
     @PostMapping("/create")
     public ResponseEntity<?> createConversation(@RequestBody Conversation conversation) throws JsonProcessingException {
@@ -79,7 +71,6 @@ public class ConversationController {
 
         return serviceResponse.getResponseEntity();
     }
-
 
     @DeleteMapping(value = "/delete/{conversationIdAsString}")
     public ResponseEntity<?> deleteConversationById(@PathVariable String conversationIdAsString){
