@@ -27,8 +27,7 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.POST, "/api/accounts/register").permitAll()
                         .anyRequest().authenticated()
                 )
-
-                .httpBasic().and()
+                .httpBasic().authenticationEntryPoint(new CustomAuthenticationEntryPoint()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();
     }
