@@ -1,11 +1,17 @@
 package pl.wasyluva.spring_messengerapi.web.http.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.wasyluva.spring_messengerapi.data.service.ProfileService;
 import pl.wasyluva.spring_messengerapi.domain.userdetails.Profile;
 import pl.wasyluva.spring_messengerapi.web.http.support.PrincipalService;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,9 +38,10 @@ public class ProfileController {
                 .getResponseEntity();
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createProfile(@RequestBody Profile newProfile){
-        return profileService.createProfile(principalService.getPrincipalAccountId(), newProfile)
+    @PostMapping(value = "/create", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<?> createProfile(@RequestParam("profile") String profileString, @RequestParam(name = "avatar", required = false) MultipartFile avatarFile) throws IOException, HttpMediaTypeNotSupportedException {
+        Profile profile = new ObjectMapper().readValue(profileString, Profile.class);
+        return profileService.createProfile(principalService.getPrincipalAccountId(), profile, avatarFile)
                 .getResponseEntity();
     }
 

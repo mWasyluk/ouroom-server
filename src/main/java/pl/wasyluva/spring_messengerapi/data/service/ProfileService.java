@@ -4,16 +4,21 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.multipart.MultipartFile;
 import pl.wasyluva.spring_messengerapi.data.repository.AccountRepository;
 import pl.wasyluva.spring_messengerapi.data.repository.ProfileRepository;
 import pl.wasyluva.spring_messengerapi.data.service.support.ServiceResponse;
 import pl.wasyluva.spring_messengerapi.data.service.support.ServiceResponseMessages;
 import pl.wasyluva.spring_messengerapi.domain.userdetails.Account;
 import pl.wasyluva.spring_messengerapi.domain.userdetails.Profile;
+import pl.wasyluva.spring_messengerapi.domain.userdetails.ProfileAvatar;
 import pl.wasyluva.spring_messengerapi.util.DebugLogger;
 import pl.wasyluva.spring_messengerapi.util.UuidUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +67,10 @@ public class ProfileService {
         return getProfileById(UUID.fromString(profileStringUuid));
     }
 
-    public ServiceResponse<?> createProfile(@NonNull UUID accountId, @NonNull Profile profile){
+    public ServiceResponse<?> createProfile(@NonNull UUID accountId, @NonNull Profile profile, MultipartFile avatarFile) throws HttpMediaTypeNotSupportedException, IOException {
+        if (avatarFile != null && !(ProfileAvatar.SUPPORTED_MEDIA_TYPES_VALUES.contains(avatarFile.getContentType())))
+            throw new HttpMediaTypeNotSupportedException("");
+
         Optional<Account> byId = accountRepository.findById(accountId);
         if (!byId.isPresent()){
             log.debug("Account with ID " + accountId + " does not exist");
@@ -72,6 +80,12 @@ public class ProfileService {
         if (byId.get().getProfile() != null){
             log.debug("Account with ID " + accountId + " already has Profile assigned");
             return new ServiceResponse<>(ServiceResponseMessages.ACCOUNT_PROFILE_ALREADY_EXISTS, HttpStatus.CONFLICT);
+        }
+
+        if (avatarFile != null && avatarFile.getContentType() != null) {
+            MediaType mediaType = MediaType.valueOf(avatarFile.getContentType());
+            ProfileAvatar avatar = new ProfileAvatar(avatarFile.getBytes(), mediaType);
+            profile.setAvatar(avatar);
         }
 
         Account account = byId.get();
