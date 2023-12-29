@@ -10,14 +10,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.format.datetime.DateFormatter;
 
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import pl.mwasyluk.ouroom_server.data.repository.AccountRepository;
 import pl.mwasyluk.ouroom_server.data.repository.ProfileRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
+import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages;
 import pl.mwasyluk.ouroom_server.domain.userdetails.Account;
 import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
 import pl.mwasyluk.ouroom_server.domain.userdetails.ProfileAvatar;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,16 +32,15 @@ import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse.UNA
 
 @ExtendWith(MockitoExtension.class)
 class ProfileServiceTest {
+    static String testFirstName = "Test";
+    static String testLastName = "Testy";
+    static Date testBirthdate = new Date();
+    Profile testProfile;
     @Mock
     private ProfileRepository profileRepository;
     @Mock
     private AccountRepository accountRepository;
     private ProfileService profileService;
-
-    static String testFirstName = "Test";
-    static String testLastName = "Testy";
-    static Date testBirthdate = new Date();
-    Profile testProfile;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +81,6 @@ class ProfileServiceTest {
             assertThat(serviceResponse.getBody()).isEqualTo(testProfile);
         }
 
-
         @Test
         @DisplayName("returns INCORRECT_ID when the Profile with the given UUID as a String does not exist")
         void returnsIncorrectIdWhenTheProfileWithTheGivenUuidAsAStringDoesNotExist() {
@@ -95,10 +96,10 @@ class ProfileServiceTest {
     class CreateProfileMethodTest {
         @Test
         @DisplayName("returns INCORRECT_ID when the Account with the given UUID does not exist")
-        void returnsIncorrectIdWhenTheAccountWithTheGivenUuidDoesNotExist(){
+        void returnsIncorrectIdWhenTheAccountWithTheGivenUuidDoesNotExist() throws HttpMediaTypeNotSupportedException, IOException {
             when(accountRepository.findById(any())).thenReturn(Optional.empty());
 
-            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile);
+            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile, null);
 
             assertThat(serviceResponse).isEqualTo(INCORRECT_ID);
             verify(accountRepository, never()).save(any());
@@ -106,12 +107,12 @@ class ProfileServiceTest {
 
         @Test
         @DisplayName("returns ALREADY_EXISTS when the Account with the given UUID already has a Profile assigned")
-        void returnsAlreadyExistsWhenTheAccountWithTheGivenUuidAlreadyHasAProfileAssigned() {
+        void returnsAlreadyExistsWhenTheAccountWithTheGivenUuidAlreadyHasAProfileAssigned() throws HttpMediaTypeNotSupportedException, IOException {
             Account account = new Account();
             account.setProfile(testProfile);
             when(accountRepository.findById(any())).thenReturn(Optional.of(account));
 
-            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile);
+            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile, null);
 
             assertThat(serviceResponse.getBody()).isEqualTo(ServiceResponseMessages.ACCOUNT_PROFILE_ALREADY_EXISTS);
             verify(accountRepository, never()).save(any());
@@ -119,13 +120,13 @@ class ProfileServiceTest {
 
         @Test
         @DisplayName("updates the Account with the given Profile")
-        void updatesTheAccountWithTheGivenProfile() {
+        void updatesTheAccountWithTheGivenProfile() throws HttpMediaTypeNotSupportedException, IOException {
             Account account = new Account();
             account.setProfile(null);
             when(accountRepository.findById(any())).thenReturn(Optional.of(account));
             when(accountRepository.save(account)).thenReturn(account);
 
-            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile);
+            profileService.createProfile(UUID.randomUUID(), testProfile, null);
 
             ArgumentCaptor<Account> accountArgumentCaptor = ArgumentCaptor.forClass(Account.class);
             verify(accountRepository).save(accountArgumentCaptor.capture());
@@ -134,13 +135,13 @@ class ProfileServiceTest {
 
         @Test
         @DisplayName("saves and returns the Profile when it has been assigned to the Account")
-        void savesAndReturnsTheProfileWhenItHasBeenAssignedToTheAccount() {
+        void savesAndReturnsTheProfileWhenItHasBeenAssignedToTheAccount() throws HttpMediaTypeNotSupportedException, IOException {
             Account account = new Account();
             account.setProfile(null);
             when(accountRepository.findById(any())).thenReturn(Optional.of(account));
             when(accountRepository.save(account)).thenReturn(account);
 
-            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile);
+            ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile, null);
 
             assertThat(serviceResponse.getBody()).isInstanceOf(Profile.class);
             verify(accountRepository).save(any());
