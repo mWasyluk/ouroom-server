@@ -1,5 +1,10 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,30 +13,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import pl.mwasyluk.ouroom_server.data.repository.AccountRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages;
 import pl.mwasyluk.ouroom_server.domain.userdetails.Account;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
-    @Mock
-    AccountRepository accountRepository;
-    AccountService accountService;
-
     final String testEmail = "test@gmail.com";
     final String testPassword = "$2a$12$psbR2EBlOAXlmrlMCpmSj.Wg/28HjOqRrgsHE1Ud0WTEwiJr5AVZu";
     final String bcryptPrefix = "{bcrypt}";
+
+    @Mock
+    AccountRepository accountRepository;
+    AccountService accountService;
     Account testAccount;
 
     @BeforeEach
@@ -81,7 +85,8 @@ class AccountServiceTest {
             sAccount.setEmail("stest@gmail.com");
             sAccount.setPassword(testPassword);
             when(accountRepository.findById(any())).thenReturn(Optional.of(testAccount)).thenReturn(Optional.empty());
-            Account.AccountRegistrationForm form = new Account.AccountRegistrationForm(sAccount.getEmail(), sAccount.getPassword());
+            Account.AccountRegistrationForm form =
+                    new Account.AccountRegistrationForm(sAccount.getEmail(), sAccount.getPassword());
 
             ServiceResponse<?> account = accountService.createAccount(form);
 
@@ -133,7 +138,9 @@ class AccountServiceTest {
             when(accountRepository.findById(any())).thenReturn(Optional.empty());
             when(accountRepository.findByEmail(any())).thenReturn(Optional.empty());
 
-            Object body = accountService.createAccount(new Account.AccountRegistrationForm(testEmail, "somePlainPassword")).getBody();
+            Object body =
+                    accountService.createAccount(new Account.AccountRegistrationForm(testEmail, "somePlainPassword"))
+                            .getBody();
 
             assertThat(body).isEqualTo(ServiceResponseMessages.PLAIN_PASSWORD_ERROR);
             verify(accountRepository, never()).save(any());
@@ -146,7 +153,8 @@ class AccountServiceTest {
             when(accountRepository.findByEmail(any())).thenReturn(Optional.empty());
             when(accountRepository.save(any())).thenReturn(new Account());
 
-            Object body = accountService.createAccount(new Account.AccountRegistrationForm(testEmail, testPassword)).getBody();
+            Object body = accountService.createAccount(new Account.AccountRegistrationForm(testEmail, testPassword))
+                    .getBody();
 
             assertThat(body).isInstanceOf(Account.class);
             ArgumentCaptor<Account> argumentCaptor = ArgumentCaptor.forClass(Account.class);
@@ -161,7 +169,8 @@ class AccountServiceTest {
             when(accountRepository.findByEmail(any())).thenReturn(Optional.empty());
             when(accountRepository.save(any())).thenReturn(testAccount);
 
-            Object body = accountService.createAccount(new Account.AccountRegistrationForm(testEmail, testPassword)).getBody();
+            Object body = accountService.createAccount(new Account.AccountRegistrationForm(testEmail, testPassword))
+                    .getBody();
 
             assertThat(body).isInstanceOf(Account.class);
             verify(accountRepository).save(any());

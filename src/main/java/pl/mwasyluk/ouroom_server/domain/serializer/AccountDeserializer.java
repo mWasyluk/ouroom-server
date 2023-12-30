@@ -1,20 +1,20 @@
 package pl.mwasyluk.ouroom_server.domain.serializer;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
+import lombok.extern.slf4j.Slf4j;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import lombok.extern.slf4j.Slf4j;
+
 import pl.mwasyluk.ouroom_server.domain.userdetails.Account;
 import pl.mwasyluk.ouroom_server.domain.userdetails.UserAuthority;
-
-import org.springframework.security.core.GrantedAuthority;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.UUID;
 
 @Slf4j
 public class AccountDeserializer extends StdDeserializer<Account> {
@@ -37,18 +37,20 @@ public class AccountDeserializer extends StdDeserializer<Account> {
         String password = node.has("password") ? node.get("password").asText() : null;
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         JsonNode authoritiesNode = node.has("authorities") ? node.findValue("authorities") : null;
-        if (authoritiesNode != null)
+        if (authoritiesNode != null) {
             for (int i = 0; i < authoritiesNode.size(); i++) {
                 grantedAuthorities.add(Enum.valueOf(UserAuthority.class, authoritiesNode.get(i).asText()));
             }
+        }
 
         if (email == null || password == null) {
             log.debug("Provided email or password is null");
             return null;
         }
         Account account = new Account(email, password, grantedAuthorities);
-        if (id != null)
+        if (id != null) {
             account.setId(UUID.fromString(id));
+        }
         return account;
     }
 }

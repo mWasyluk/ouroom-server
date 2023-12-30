@@ -1,23 +1,23 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import pl.mwasyluk.ouroom_server.data.repository.AccountRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages;
 import pl.mwasyluk.ouroom_server.domain.userdetails.Account;
 import pl.mwasyluk.ouroom_server.util.BcryptUtils;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -59,8 +59,8 @@ public class AccountService implements UserDetailsService {
 
         Optional<Account> byId = accountRepository.findById(account.getId());
         while (byId.isPresent()) {
-            log.debug("Not possible just happened. The same UUID has been generated for two accounts. UUID: "
-                    + account.getId());
+            log.debug("Not possible just happened. The same UUID has been generated for two accounts. UUID: " +
+                      account.getId());
             account.setId(UUID.randomUUID());
             byId = accountRepository.findById(account.getId());
         }
@@ -86,7 +86,6 @@ public class AccountService implements UserDetailsService {
     }
 
     // TODO: Add method createAdminAccount()
-
     public ServiceResponse<?> deleteAccount(@NonNull UUID requestingUserUuid) {
         Optional<Account> byId = accountRepository.findById(requestingUserUuid);
         if (!byId.isPresent()) {
@@ -102,5 +101,4 @@ public class AccountService implements UserDetailsService {
         }
         return deleteAccount(UUID.fromString(requestingUserStringUuid));
     }
-
 }

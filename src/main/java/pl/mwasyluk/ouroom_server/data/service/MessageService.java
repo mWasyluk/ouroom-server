@@ -1,21 +1,21 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import pl.mwasyluk.ouroom_server.data.repository.MessageRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.domain.message.Conversation;
 import pl.mwasyluk.ouroom_server.domain.message.Message;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
-
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 
@@ -51,14 +51,18 @@ public class MessageService {
             return ServiceResponse.UNAUTHORIZED;
         }
 
-        if (updatedMessage.getContent() != null)
+        if (updatedMessage.getContent() != null) {
             persistedMessage.setContent(updatedMessage.getContent());
-        if (updatedMessage.getSentDate() != null && persistedMessage.getSentDate() == null)
+        }
+        if (updatedMessage.getSentDate() != null && persistedMessage.getSentDate() == null) {
             persistedMessage.setSentDate(updatedMessage.getSentDate());
-        if (updatedMessage.getDeliveryDate() != null && persistedMessage.getDeliveryDate() == null)
+        }
+        if (updatedMessage.getDeliveryDate() != null && persistedMessage.getDeliveryDate() == null) {
             persistedMessage.setDeliveryDate(updatedMessage.getDeliveryDate());
-        if (updatedMessage.getReadDate() != null && persistedMessage.getReadDate() == null)
+        }
+        if (updatedMessage.getReadDate() != null && persistedMessage.getReadDate() == null) {
             persistedMessage.setReadDate(updatedMessage.getReadDate());
+        }
 
         Message updatedPersistedMessage = messageRepository.save(persistedMessage);
         log.debug("Message updated");
@@ -98,7 +102,6 @@ public class MessageService {
             return ServiceResponse.INCORRECT_ID;
         }
         return deleteMessage(requestingUserId, UUID.fromString(messageUuid));
-
     }
 
     // TODO: Test pageable

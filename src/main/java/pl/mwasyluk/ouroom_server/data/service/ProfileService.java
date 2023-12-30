@@ -1,8 +1,25 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.multipart.MultipartFile;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import pl.mwasyluk.ouroom_server.data.repository.AccountRepository;
 import pl.mwasyluk.ouroom_server.data.repository.ProfileRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
@@ -12,16 +29,6 @@ import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
 import pl.mwasyluk.ouroom_server.domain.userdetails.ProfileAvatar;
 import pl.mwasyluk.ouroom_server.util.DebugLogger;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -50,10 +57,8 @@ public class ProfileService {
         return new ServiceResponse<>(optionalAccount.get().getProfile(), HttpStatus.OK);
     }
 
-    // TODO: Add a requestingUser parameter to the method and check if he is on
-    // 'friend list'
-    // if true -> return a full object
-    // if false -> return a snip of the object (DTO)
+    // TODO: Add a requestingUser parameter to the method and check if he is on 'friend list' if true -> return a full
+    //       object if false -> return a snip of the object (DTO)
     public ServiceResponse<?> getProfileById(@NonNull UUID profileUuid) {
         Optional<Profile> byId = profileRepository.findById(profileUuid);
         if (!byId.isPresent()) {
@@ -71,8 +76,9 @@ public class ProfileService {
 
     public ServiceResponse<?> createProfile(@NonNull UUID accountId, @NonNull Profile profile, MultipartFile avatarFile)
             throws HttpMediaTypeNotSupportedException, IOException {
-        if (avatarFile != null && !(ProfileAvatar.SUPPORTED_MEDIA_TYPES_VALUES.contains(avatarFile.getContentType())))
+        if (avatarFile != null && !(ProfileAvatar.SUPPORTED_MEDIA_TYPES_VALUES.contains(avatarFile.getContentType()))) {
             throw new HttpMediaTypeNotSupportedException("");
+        }
 
         Optional<Account> byId = accountRepository.findById(accountId);
         if (!byId.isPresent()) {
@@ -98,8 +104,7 @@ public class ProfileService {
         return new ServiceResponse<>(accountRepository.save(account).getProfile(), HttpStatus.CREATED);
     }
 
-    // TODO: Add a requestingUser parameter to the method and check if he is the
-    // owner of the profile
+    // TODO: Add a requestingUser parameter to the method and check if he is the owner of the profile
     public ServiceResponse<?> updateProfile(@NonNull UUID requestingProfileUuid, @NonNull Profile updatedProfile) {
         if (updatedProfile.getId() == null) {
             log.debug("UserProfile provided as updated has to have an ID");

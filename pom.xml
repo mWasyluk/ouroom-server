@@ -1,228 +1,228 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.3</version>
-		<relativePath/>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.3</version>
+        <relativePath/>
+    </parent>
 
-	<groupId>pl.mwasyluk</groupId>
-	<artifactId>ouroom_server</artifactId>
-	<version>1.1.0</version>
-	<name>ouroom_server</name>
-	<description>Live chat application server</description>
+    <groupId>pl.mwasyluk</groupId>
+    <artifactId>ouroom_server</artifactId>
+    <version>1.1.0</version>
+    <name>ouroom_server</name>
+    <description>Live chat application server</description>
 
-	<properties>
-		<java.version>1.8</java.version>
+    <properties>
+        <java.version>1.8</java.version>
 
-		<ouroom.paths.base>${project.basedir}\..\</ouroom.paths.base>
-		<ouroom.paths.backend>${ouroom.paths.base}\server</ouroom.paths.backend>
-		<ouroom.paths.frontend>${ouroom.paths.base}\frontend</ouroom.paths.frontend>
-		<ouroom.paths.builds>${ouroom.paths.base}\builds</ouroom.paths.builds>
+        <ouroom.paths.base>${project.basedir}\..\</ouroom.paths.base>
+        <ouroom.paths.backend>${ouroom.paths.base}\server</ouroom.paths.backend>
+        <ouroom.paths.frontend>${ouroom.paths.base}\frontend</ouroom.paths.frontend>
+        <ouroom.paths.builds>${ouroom.paths.base}\builds</ouroom.paths.builds>
 
-		<ouroom.versions.frontend-plugin>1.12.1</ouroom.versions.frontend-plugin>
-		<ouroom.versions.node>v16.17.0</ouroom.versions.node>
-		<ouroom.versions.npm>9.2.0</ouroom.versions.npm>
-	</properties>
+        <ouroom.versions.frontend-plugin>1.12.1</ouroom.versions.frontend-plugin>
+        <ouroom.versions.node>v16.17.0</ouroom.versions.node>
+        <ouroom.versions.npm>9.2.0</ouroom.versions.npm>
+    </properties>
 
-	<dependencies>
-		<!-- Spring dependencies -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
+    <dependencies>
+        <!-- Spring dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
 
-		<!-- Database -->
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- Database -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-		<!-- Development tools -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
+        <!-- Development tools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
 
-		<!-- Tests tools -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <!-- Tests tools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<outputDirectory>${ouroom.paths.builds}/${project.version}</outputDirectory>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${ouroom.paths.builds}/${project.version}</outputDirectory>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
+    <profiles>
+        <!-- Pack the backend side into an executable jar file -->
+        <profile>
+            <id>server</id>
 
-	<profiles>
-		<!-- Pack the backend side into an executable jar file -->
-		<profile>
-			<id>server</id>
+            <activation>
+                <property>
+                    <name>server-only</name>
+                    <value>true</value>
+                </property>
+            </activation>
 
-			<activation>
-				<property>
-					<name>server-only</name>
-					<value>true</value>
-				</property>
-			</activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <classifier>server</classifier>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<configuration>
-							<classifier>server</classifier>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <!-- Prepare Node.js and npm to eventually build the frontend side -->
+        <profile>
+            <id>build-frontend</id>
 
-		<!-- Prepare Node.js and npm to eventually build the frontend side -->
-		<profile>
-			<id>build-frontend</id>
+            <activation>
+                <property>
+                    <name>skip-node</name>
+                    <value>!true</value>
+                </property>
+            </activation>
 
-			<activation>
-				<property>
-					<name>skip-node</name>
-					<value>!true</value>
-				</property>
-			</activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${ouroom.versions.frontend-plugin}</version>
 
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.github.eirslett</groupId>
-						<artifactId>frontend-maven-plugin</artifactId>
-						<version>${ouroom.versions.frontend-plugin}</version>
+                        <configuration>
+                            <workingDirectory>${ouroom.paths.frontend}</workingDirectory>
+                            <installDirectory>${project.build.directory}</installDirectory>
+                        </configuration>
 
-						<configuration>
-							<workingDirectory>${ouroom.paths.frontend}</workingDirectory>
-							<installDirectory>${project.build.directory}</installDirectory>
-						</configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>${ouroom.versions.node}</nodeVersion>
+                                    <npmVersion>${ouroom.versions.npm}</npmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>npm run build</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
-						<executions>
-							<execution>
-								<id>install node and npm</id>
-								<goals>
-									<goal>install-node-and-npm</goal>
-								</goals>
-								<configuration>
-									<nodeVersion>${ouroom.versions.node}</nodeVersion>
-									<npmVersion>${ouroom.versions.npm}</npmVersion>
-								</configuration>
-							</execution>
-							<execution>
-								<id>npm install</id>
-								<goals>
-									<goal>npm</goal>
-								</goals>
-								<configuration>
-									<arguments>install</arguments>
-								</configuration>
-							</execution>
-							<execution>
-								<id>npm run build</id>
-								<goals>
-									<goal>npm</goal>
-								</goals>
-								<configuration>
-									<arguments>run build</arguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+        <!-- Pack the backend and frontend side into an executable jar file -->
+        <profile>
+            <id>complete</id>
 
-		<!-- Pack the backend and frontend side into an executable jar file -->
-		<profile>
-			<id>complete</id>
+            <activation>
+                <property>
+                    <name>server-only</name>
+                    <value>!true</value>
+                </property>
+            </activation>
 
-			<activation>
-				<property>
-					<name>server-only</name>
-					<value>!true</value>
-				</property>
-			</activation>
-
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>supply-frontend</id>
-								<phase>generate-resources</phase>
-								<configuration>
-									<failOnError>true</failOnError>
-									<target>
-										<copy todir="${project.build.outputDirectory}\public">
-											<fileset dir="${ouroom.paths.frontend}\build"/>
-										</copy>
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>supply-frontend</id>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <failOnError>true</failOnError>
+                                    <target>
+                                        <copy todir="${project.build.outputDirectory}\public">
+                                            <fileset dir="${ouroom.paths.frontend}\build"/>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

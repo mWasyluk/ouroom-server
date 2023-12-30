@@ -1,7 +1,5 @@
 package pl.mwasyluk.ouroom_server.web.http.exception;
 
-import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.*;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,9 +11,14 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.INCORRECT_OBJECT_PROVIDED;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.PAYLOAD_TOO_LARGE;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.UNAUTHORIZED;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.UNSUPPORTED_IMAGE_MEDIA_TYPE;
+
 @ControllerAdvice
 public class ControllerExceptionHandler {
-    @ExceptionHandler(value = { HttpMessageNotReadableException.class, NullPointerException.class })
+    @ExceptionHandler(value = {HttpMessageNotReadableException.class, NullPointerException.class})
     public ResponseEntity<?> handleHttpMessageNotReadableException() {
         return new ServiceResponse<>(INCORRECT_OBJECT_PROVIDED, HttpStatus.BAD_REQUEST).getResponseEntity();
     }

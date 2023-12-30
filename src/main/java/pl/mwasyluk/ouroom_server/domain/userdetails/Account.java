@@ -1,29 +1,28 @@
 package pl.mwasyluk.ouroom_server.domain.userdetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import pl.mwasyluk.ouroom_server.domain.serializer.AccountDeserializer;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import javax.persistence.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.*;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import pl.mwasyluk.ouroom_server.domain.serializer.AccountDeserializer;
 
 @Data
 @NoArgsConstructor
 @JsonDeserialize(using = AccountDeserializer.class)
 
 @Entity
-// TODO: Change to "accounts" and update the default query in
-// AuthenticationProvider
+// TODO: Change to "accounts" and update the default query in AuthenticationProvider
 @Table(name = "USERS")
 public class Account implements UserDetails {
     @Id
@@ -35,7 +34,7 @@ public class Account implements UserDetails {
     @JsonIgnore
     private String password;
 
-    @OneToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH })
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH})
     @JoinColumn(name = "profile_id", unique = true)
     @JsonIgnoreProperties("account")
     private Profile profile;
@@ -71,6 +70,11 @@ public class Account implements UserDetails {
     }
 
     @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
+    }
+
+    @Override
     public String getPassword() {
         return this.password;
     }
@@ -79,11 +83,6 @@ public class Account implements UserDetails {
     @JsonIgnore
     public String getUsername() {
         return this.email;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
     }
 
     @Override
@@ -107,22 +106,24 @@ public class Account implements UserDetails {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        Account account = (Account) o;
-        return accountNonExpired == account.accountNonExpired && accountNonLocked == account.accountNonLocked
-                && credentialsNonExpired == account.credentialsNonExpired && enabled == account.enabled
-                && id.equals(account.id) && email.equals(account.email)
-                && Objects.equals(authorities, account.authorities);
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(id, email, authorities, accountNonExpired, accountNonLocked, credentialsNonExpired,
                 enabled);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Account account = (Account) o;
+        return accountNonExpired == account.accountNonExpired && accountNonLocked == account.accountNonLocked
+               && credentialsNonExpired == account.credentialsNonExpired && enabled == account.enabled
+               && id.equals(account.id) && email.equals(account.email)
+               && Objects.equals(authorities, account.authorities);
     }
 
     @Data

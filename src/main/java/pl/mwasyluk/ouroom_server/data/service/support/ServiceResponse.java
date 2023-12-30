@@ -1,10 +1,10 @@
 package pl.mwasyluk.ouroom_server.data.service.support;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ServiceResponse<T> extends ResponseEntity<T> {
     public static final ServiceResponse<String> INCORRECT_ID = new ServiceResponse<>(
@@ -45,5 +45,4 @@ public class ServiceResponse<T> extends ResponseEntity<T> {
     public ResponseEntity<?> getResponseEntity() {
         return new ResponseEntity<>(this, this.getStatusCode());
     }
-
 }

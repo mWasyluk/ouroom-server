@@ -22,7 +22,8 @@ public interface ServiceResponseMessages {
     String ID_NOT_FOUND = "Przesłany identyfikator nie został odnaleziony";
     String NOT_FOUND_ENTITY = "Obiekt nie został odnaleziony";
 
-    String UNSUPPORTED_IMAGE_MEDIA_TYPE = "Format przesłanego obrazu jest nieprawidłowy. Wspierane formaty to: PNG, JPG, JPEG)";
+    String UNSUPPORTED_IMAGE_MEDIA_TYPE =
+            "Format przesłanego obrazu jest nieprawidłowy. Wspierane formaty to: PNG, JPG, JPEG)";
     String PAYLOAD_TOO_LARGE = "Przesłany plik jest za duży. Maksymalny rozmiar to 300KB";
     String INVALID_FILE = "Przesłany plik jest pusty lub nieprawidłowy";
 }

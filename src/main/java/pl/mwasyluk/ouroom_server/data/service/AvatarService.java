@@ -1,21 +1,21 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import pl.mwasyluk.ouroom_server.data.repository.AvatarRepository;
-import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
-import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
-import pl.mwasyluk.ouroom_server.domain.userdetails.ProfileAvatar;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
+import pl.mwasyluk.ouroom_server.data.repository.AvatarRepository;
+import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
+import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
+import pl.mwasyluk.ouroom_server.domain.userdetails.ProfileAvatar;
 
 @RequiredArgsConstructor
 @Service
@@ -36,8 +36,9 @@ public class AvatarService {
     public ServiceResponse<?> updateProfileAvatar(@NonNull UUID requestingProfileUuid, MultipartFile file)
             throws HttpMediaTypeNotSupportedException, IOException {
         if (file.isEmpty() || file.getContentType() == null
-                || !(ProfileAvatar.SUPPORTED_MEDIA_TYPES_VALUES.contains(file.getContentType())))
+            || !(ProfileAvatar.SUPPORTED_MEDIA_TYPES_VALUES.contains(file.getContentType()))) {
             throw new HttpMediaTypeNotSupportedException("");
+        }
 
         MediaType mediaType = MediaType.valueOf(file.getContentType());
         ProfileAvatar avatar = new ProfileAvatar(file.getBytes(), mediaType);

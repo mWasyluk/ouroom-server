@@ -1,6 +1,23 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
-import org.junit.jupiter.api.*;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -8,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import pl.mwasyluk.ouroom_server.data.repository.ConversationRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages;
@@ -16,15 +34,14 @@ import pl.mwasyluk.ouroom_server.domain.message.Message;
 import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
 
-import java.lang.reflect.Constructor;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse.INCORRECT_ID;
 import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse.UNAUTHORIZED;
 import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.CANNOT_ADD_MESSAGE_TO_CONVERSATION;
@@ -42,7 +59,7 @@ class ConversationServiceTest {
     Conversation testConversation = new Conversation(Arrays.asList(testParticipator1, testParticipator2));
 
     @BeforeEach
-    void setEach(){
+    void setEach() {
         conversationService = new ConversationService(conversationRepository);
         testConversation.setId(UUID.randomUUID());
     }
@@ -62,7 +79,8 @@ class ConversationServiceTest {
         @Test
         @DisplayName("returns INCORRECT_ID when the given UUID as String is an invalid UUID")
         void returnsIncorrectIdWhenTheGivenUuidAsStringIsAnInvalidUuid() {
-            ServiceResponse<?> serviceResponse = conversationService.getById(testParticipator1.getId(), UuidUtils.INVALID_UUID_AS_STRING);
+            ServiceResponse<?> serviceResponse =
+                    conversationService.getById(testParticipator1.getId(), UuidUtils.INVALID_UUID_AS_STRING);
 
             assertThat(serviceResponse).isEqualTo(INCORRECT_ID);
             verify(conversationRepository, never()).findById(any());
@@ -73,7 +91,8 @@ class ConversationServiceTest {
         void returnIncorrectIdWhenTheConversationWithTheGivenUuidDoesNotExist() {
             when(conversationRepository.findById(any())).thenReturn(Optional.empty());
 
-            ServiceResponse<?> serviceResponse = conversationService.getById(testParticipator1.getId(), testConversation.getId());
+            ServiceResponse<?> serviceResponse =
+                    conversationService.getById(testParticipator1.getId(), testConversation.getId());
 
             assertThat(serviceResponse).isEqualTo(INCORRECT_ID);
         }
@@ -83,7 +102,8 @@ class ConversationServiceTest {
         void returnsUnauthorizedWhenTheRequestingProfileIsNotAParticipatorInTheConversation() {
             when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
 
-            ServiceResponse<?> serviceResponse = conversationService.getById(UUID.randomUUID(), testConversation.getId());
+            ServiceResponse<?> serviceResponse =
+                    conversationService.getById(UUID.randomUUID(), testConversation.getId());
 
             assertThat(serviceResponse).isEqualTo(UNAUTHORIZED);
         }
@@ -98,11 +118,14 @@ class ConversationServiceTest {
 
         @ParameterizedTest
         @MethodSource("participatorsSource")
-        @DisplayName("does not return UNAUTHORIZED when the requesting Profile is one of the participators in the Conversation")
-        void doesNotReturnUnauthorizedWhenTheRequestingProfileIsOneOfTheParticipatorsInTheConversation(Profile participator) {
+        @DisplayName("does not return UNAUTHORIZED when the requesting Profile is one of the participators in the " +
+                     "Conversation")
+        void doesNotReturnUnauthorizedWhenTheRequestingProfileIsOneOfTheParticipatorsInTheConversation(
+                Profile participator) {
             when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
 
-            ServiceResponse<?> serviceResponse = conversationService.getById(participator.getId(), testConversation.getId());
+            ServiceResponse<?> serviceResponse =
+                    conversationService.getById(participator.getId(), testConversation.getId());
 
             assertThat(serviceResponse).isNotEqualTo(UNAUTHORIZED);
         }
@@ -112,8 +135,10 @@ class ConversationServiceTest {
         void returnsTheConversationWhenAHappyPathCaseOccurs() {
             when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
 
-            ServiceResponse<?> serviceResponseByUuid = conversationService.getById(testParticipator1.getId(), testConversation.getId());
-            ServiceResponse<?> serviceResponseByString = conversationService.getById(testParticipator1.getId(), testConversation.getId().toString());
+            ServiceResponse<?> serviceResponseByUuid =
+                    conversationService.getById(testParticipator1.getId(), testConversation.getId());
+            ServiceResponse<?> serviceResponseByString =
+                    conversationService.getById(testParticipator1.getId(), testConversation.getId().toString());
 
             assertThat(serviceResponseByUuid.getBody()).isEqualTo(testConversation);
             assertThat(serviceResponseByString.getBody()).isEqualTo(testConversation);
@@ -127,14 +152,15 @@ class ConversationServiceTest {
         Collection<Profile> participators = new ArrayList<>();
 
         @BeforeEach
-        void resetTestConversation(){
+        void resetTestConversation() {
             testConversation = new Conversation(Arrays.asList(testParticipator1, testParticipator2));
         }
 
-        Profile onlyUuid1() throws Exception{
-            return getDummyProfileWithOnlyUuid(testParticipator1.getId()); 
+        Profile onlyUuid1() throws Exception {
+            return getDummyProfileWithOnlyUuid(testParticipator1.getId());
         }
-        Profile onlyUuid2() throws Exception{
+
+        Profile onlyUuid2() throws Exception {
             return getDummyProfileWithOnlyUuid(testParticipator2.getId());
         }
 
@@ -143,7 +169,8 @@ class ConversationServiceTest {
         void returnsUnauthorizedWhenTheRequestingProfileIsNotOneOfTheParticipators() throws Exception {
             Collection<Profile> participators = new ArrayList<>(Arrays.asList(onlyUuid1(), onlyUuid2()));
 
-            ServiceResponse<?> serviceResponse = conversationService.createConversation(UUID.randomUUID(), participators);
+            ServiceResponse<?> serviceResponse =
+                    conversationService.createConversation(UUID.randomUUID(), participators);
 
             assertThat(serviceResponse).isEqualTo(UNAUTHORIZED);
         }
@@ -159,11 +186,13 @@ class ConversationServiceTest {
         @ParameterizedTest
         @MethodSource("participatorsSource")
         @DisplayName("does not return UNAUTHORIZED when the requesting Profile is one of the participators")
-        void doesNotReturnUnauthorizedWhenTheRequestingProfileIsOneOfTheParticipators(Profile participator) throws Exception {
+        void doesNotReturnUnauthorizedWhenTheRequestingProfileIsOneOfTheParticipators(Profile participator)
+                throws Exception {
             Collection<Profile> participators = new ArrayList<>(Arrays.asList(onlyUuid1(), onlyUuid2()));
             when(conversationRepository.save(any())).thenReturn(new Conversation());
 
-            ServiceResponse<?> serviceResponse = conversationService.createConversation(testParticipator1.getId(), participators);
+            ServiceResponse<?> serviceResponse =
+                    conversationService.createConversation(testParticipator1.getId(), participators);
 
             assertThat(serviceResponse).isNotEqualTo(UNAUTHORIZED);
         }
@@ -172,10 +201,12 @@ class ConversationServiceTest {
         @DisplayName("rejects Profiles duplications in the participators list")
         void rejectsProfilesDuplicationsInTheParticipatorsList() throws Exception {
             testConversation.setParticipators(Collections.singletonList(testParticipator1));
-            when(conversationRepository.findByParticipatorsIdIn(anyList())).thenReturn(Collections.singletonList(testConversation));
+            when(conversationRepository.findByParticipatorsIdIn(anyList())).thenReturn(
+                    Collections.singletonList(testConversation));
             Collection<Profile> participators = new ArrayList<>(Arrays.asList(onlyUuid1(), onlyUuid1(), onlyUuid1()));
 
-            ServiceResponse<?> serviceResponse = conversationService.createConversation(testParticipator1.getId(), participators);
+            ServiceResponse<?> serviceResponse =
+                    conversationService.createConversation(testParticipator1.getId(), participators);
 
             assertThat(serviceResponse.getBody()).isEqualTo(CONVERSATION_CONFLICT);
         }
@@ -185,20 +216,23 @@ class ConversationServiceTest {
         void returnsInvalidParticipatorsWhenTheParticipatorsListIsEmpty() {
             Collection<Profile> participators = new ArrayList<>();
 
-            ServiceResponse<?> serviceResponse = conversationService.createConversation(testParticipator1.getId(), participators);
+            ServiceResponse<?> serviceResponse =
+                    conversationService.createConversation(testParticipator1.getId(), participators);
 
             assertThat(serviceResponse.getBody()).isEqualTo(ServiceResponseMessages.INVALID_CONVERSATION_PARTICIPATORS);
         }
 
         @Test
         @DisplayName("does not return INVALID_PARTICIPATORS when the participators list contains one Profile")
-        void doesNotReturnInvalidParticipatorsWhenTheParticipatorsListContainsOneProfile() throws Exception{
+        void doesNotReturnInvalidParticipatorsWhenTheParticipatorsListContainsOneProfile() throws Exception {
             Collection<Profile> participators = new ArrayList<>(Collections.singletonList(onlyUuid1()));
             when(conversationRepository.save(any())).thenReturn(new Conversation());
 
-            ServiceResponse<?> serviceResponse = conversationService.createConversation(testParticipator1.getId(), participators);
+            ServiceResponse<?> serviceResponse =
+                    conversationService.createConversation(testParticipator1.getId(), participators);
 
-            assertThat(serviceResponse.getBody()).isNotEqualTo(ServiceResponseMessages.INVALID_CONVERSATION_PARTICIPATORS);
+            assertThat(serviceResponse.getBody()).isNotEqualTo(
+                    ServiceResponseMessages.INVALID_CONVERSATION_PARTICIPATORS);
         }
 
         @Nested
@@ -224,15 +258,15 @@ class ConversationServiceTest {
                         onlyUuid1(),
                         onlyUuid2()));
                 sParticipators1and2andRandR = new ArrayList<>(Arrays.asList(
-                    onlyUuid1(),
-                    onlyUuid2(),
-                    getDummyProfileWithOnlyUuid(UUID.randomUUID()),
-                    getDummyProfileWithOnlyUuid(UUID.randomUUID())));
+                        onlyUuid1(),
+                        onlyUuid2(),
+                        getDummyProfileWithOnlyUuid(UUID.randomUUID()),
+                        getDummyProfileWithOnlyUuid(UUID.randomUUID())));
                 sParticipators1and2andR2andR2 = new ArrayList<>(Arrays.asList(
-                    onlyUuid1(),
-                    onlyUuid2(),
-                    getDummyProfileWithOnlyUuid(UUID.randomUUID()),
-                    getDummyProfileWithOnlyUuid(UUID.randomUUID())));
+                        onlyUuid1(),
+                        onlyUuid2(),
+                        getDummyProfileWithOnlyUuid(UUID.randomUUID()),
+                        getDummyProfileWithOnlyUuid(UUID.randomUUID())));
                 sConversation1 = new Conversation(sParticipator1);
                 sConversation2 = new Conversation(sParticipator2);
                 sConversations1and2 = new Conversation(sParticipators1and2);
@@ -242,7 +276,7 @@ class ConversationServiceTest {
 
             @Test
             @DisplayName("when many Conversations has been found and none has the exact participators list")
-            void whenManyConversationsHasBeenFoundAndNoneHasTheExactParticipatorsList() throws Exception{
+            void whenManyConversationsHasBeenFoundAndNoneHasTheExactParticipatorsList() throws Exception {
                 when(conversationRepository.findByParticipatorsIdIn(anyList())).thenReturn(Arrays.asList(
                         sConversation1,
                         sConversation2,
@@ -256,7 +290,8 @@ class ConversationServiceTest {
                         .peek(p -> p.addConversation(conversation))
                         .collect(Collectors.toList());
 
-                ServiceResponse<?> serviceResponse = conversationService.createConversation(testParticipator1.getId(), participators);
+                ServiceResponse<?> serviceResponse =
+                        conversationService.createConversation(testParticipator1.getId(), participators);
 
                 assertThat(serviceResponse.getBody()).isInstanceOf(Conversation.class);
                 ArgumentCaptor<Conversation> conversationArgumentCaptor = ArgumentCaptor.forClass(Conversation.class);
@@ -278,7 +313,8 @@ class ConversationServiceTest {
                 ));
                 Collection<Profile> participators = new ArrayList<>(Arrays.asList(onlyUuid1(), onlyUuid2()));
 
-                ServiceResponse<?> serviceResponse = conversationService.createConversation(testParticipator1.getId(), participators);
+                ServiceResponse<?> serviceResponse =
+                        conversationService.createConversation(testParticipator1.getId(), participators);
 
                 assertThat(serviceResponse.getBody()).isEqualTo(CONVERSATION_CONFLICT);
             }
@@ -313,42 +349,6 @@ class ConversationServiceTest {
 
             assertThat(serviceResponse).isEqualTo(INCORRECT_ID);
             verify(conversationRepository, never()).findById(any());
-        }
-
-        @Nested
-        @DisplayName("returns UNAUTHORIZED when the requesting user's Profile")
-        class ReturnsUnauthorizedWhenTheRequestingUserSProfileTestCase {
-            @Test
-            @DisplayName("is not a participator in the Conversation but sends the message from a participator")
-            void isNotAParticipatorInTheConversationButSendsTheMessageFromAParticipator() {
-                when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
-
-                ServiceResponse<?> serviceResponse = conversationService
-                        .addMessageToConversationById(
-                                UUID.randomUUID(),
-                                testConversation.getId(),
-                                testMessageFrom1);
-
-                assertThat(serviceResponse).isEqualTo(UNAUTHORIZED);
-                assertThat(testConversation.getParticipators()).contains(testParticipator1);
-            }
-
-            @Test
-            @DisplayName("is not a participator in the Conversation and sends the message from himself")
-            void isNotAParticipatorInTheConversationAndSendsTheMessageFromHimself() throws Exception {
-                when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
-                Profile sProfile = getDummyProfileWithOnlyUuid(UUID.randomUUID());
-                Message sMessage = new Message(sProfile.getId(), new Message.TempMessage("sTest"));
-
-                ServiceResponse<?> serviceResponse = conversationService
-                        .addMessageToConversationById(
-                                sProfile.getId(),
-                                testConversation.getId(),
-                                sMessage);
-
-                assertThat(serviceResponse).isEqualTo(UNAUTHORIZED);
-                assertThat(testConversation.getParticipators()).contains(testParticipator1).contains(testParticipator2);
-            }
         }
 
         @Test
@@ -433,6 +433,42 @@ class ConversationServiceTest {
             verify(conversationRepository).save(conversationArgumentCaptor.capture());
             assertThat(conversationArgumentCaptor.getValue().getMessages()).contains(testMessageFrom1);
             assertThat(testConversation.getParticipators()).contains(testParticipator1).contains(testParticipator2);
+        }
+
+        @Nested
+        @DisplayName("returns UNAUTHORIZED when the requesting user's Profile")
+        class ReturnsUnauthorizedWhenTheRequestingUserSProfileTestCase {
+            @Test
+            @DisplayName("is not a participator in the Conversation but sends the message from a participator")
+            void isNotAParticipatorInTheConversationButSendsTheMessageFromAParticipator() {
+                when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
+
+                ServiceResponse<?> serviceResponse = conversationService
+                        .addMessageToConversationById(
+                                UUID.randomUUID(),
+                                testConversation.getId(),
+                                testMessageFrom1);
+
+                assertThat(serviceResponse).isEqualTo(UNAUTHORIZED);
+                assertThat(testConversation.getParticipators()).contains(testParticipator1);
+            }
+
+            @Test
+            @DisplayName("is not a participator in the Conversation and sends the message from himself")
+            void isNotAParticipatorInTheConversationAndSendsTheMessageFromHimself() throws Exception {
+                when(conversationRepository.findById(any())).thenReturn(Optional.ofNullable(testConversation));
+                Profile sProfile = getDummyProfileWithOnlyUuid(UUID.randomUUID());
+                Message sMessage = new Message(sProfile.getId(), new Message.TempMessage("sTest"));
+
+                ServiceResponse<?> serviceResponse = conversationService
+                        .addMessageToConversationById(
+                                sProfile.getId(),
+                                testConversation.getId(),
+                                sMessage);
+
+                assertThat(serviceResponse).isEqualTo(UNAUTHORIZED);
+                assertThat(testConversation.getParticipators()).contains(testParticipator1).contains(testParticipator2);
+            }
         }
     }
 }

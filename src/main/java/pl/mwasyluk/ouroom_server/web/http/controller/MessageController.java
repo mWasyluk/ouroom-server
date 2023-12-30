@@ -1,21 +1,29 @@
 package pl.mwasyluk.ouroom_server.web.http.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Date;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import pl.mwasyluk.ouroom_server.data.service.ConversationService;
 import pl.mwasyluk.ouroom_server.data.service.MessageService;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.domain.message.Message;
 import pl.mwasyluk.ouroom_server.web.http.support.PrincipalService;
 import pl.mwasyluk.ouroom_server.web.websocket.MessagingTemplate;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 @Slf4j
 @RestController
@@ -55,25 +63,25 @@ public class MessageController {
         int pageSize = 30;
 
         return messageService.getAllMessagesByConversationId(
-                principalService.getPrincipalProfileId(),
-                conversationIdAsString,
-                PageRequest.of(page, pageSize))
+                        principalService.getPrincipalProfileId(),
+                        conversationIdAsString,
+                        PageRequest.of(page, pageSize))
                 .getResponseEntity();
     }
 
     @PatchMapping("/update")
     public ResponseEntity<?> updateMessage(@RequestBody Message updatedMessage) {
         return messageService.updateMessage(
-                principalService.getPrincipalProfileId(),
-                updatedMessage)
+                        principalService.getPrincipalProfileId(),
+                        updatedMessage)
                 .getResponseEntity();
     }
 
     @DeleteMapping("/delete/{messageIdAsString}")
     public ResponseEntity<?> deleteMessage(@PathVariable String messageIdAsString) {
         return messageService.deleteMessage(
-                principalService.getPrincipalProfileId(),
-                messageIdAsString)
+                        principalService.getPrincipalProfileId(),
+                        messageIdAsString)
                 .getResponseEntity();
     }
 }

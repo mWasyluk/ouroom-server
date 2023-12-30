@@ -1,14 +1,14 @@
 package pl.mwasyluk.ouroom_server.web.http.support;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import pl.mwasyluk.ouroom_server.data.repository.AccountRepository;
 import pl.mwasyluk.ouroom_server.domain.userdetails.Account;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class PrincipalService {
@@ -20,8 +20,9 @@ public class PrincipalService {
 
     public UUID getPrincipalAccountId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication.getPrincipal() instanceof Account))
+        if (!(authentication.getPrincipal() instanceof Account)) {
             return null;
+        }
 
         return ((Account) authentication.getPrincipal()).getId();
     }
@@ -36,5 +37,4 @@ public class PrincipalService {
         }
         return byId.get().getProfile().getId();
     }
-
 }

@@ -1,5 +1,10 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,18 +13,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
+
 import pl.mwasyluk.ouroom_server.data.repository.MessageRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.domain.message.Conversation;
 import pl.mwasyluk.ouroom_server.domain.message.Message;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
@@ -178,7 +183,8 @@ class MessageServiceTest {
             when(messageRepository.findById(testMessage.getId())).thenReturn(Optional.of(testMessage));
             doReturn(ServiceResponse.UNAUTHORIZED).when(conversationService).getById(any(UUID.class), any(UUID.class));
 
-            ServiceResponse<?> serviceResponse = messageService.deleteMessage(testMessageAuthorUuid, testMessage.getId());
+            ServiceResponse<?> serviceResponse =
+                    messageService.deleteMessage(testMessageAuthorUuid, testMessage.getId());
 
             assertThat(serviceResponse).isEqualTo(ServiceResponse.UNAUTHORIZED);
         }
@@ -190,16 +196,19 @@ class MessageServiceTest {
             conversation.setId(UUID.randomUUID());
             testMessage.setConversation(conversation);
             when(messageRepository.findById(testMessage.getId())).thenReturn(Optional.of(testMessage));
-            ServiceResponse<Conversation> conversationServiceResponse = new ServiceResponse<>(conversation, HttpStatus.OK);
+            ServiceResponse<Conversation> conversationServiceResponse =
+                    new ServiceResponse<>(conversation, HttpStatus.OK);
             doReturn(conversationServiceResponse).when(conversationService).getById(any(UUID.class), any(UUID.class));
 
-            ServiceResponse<?> serviceResponse = messageService.deleteMessage(testMessageAuthorUuid, testMessage.getId());
+            ServiceResponse<?> serviceResponse =
+                    messageService.deleteMessage(testMessageAuthorUuid, testMessage.getId());
 
             assertThat(serviceResponse).isEqualTo(ServiceResponse.OK);
             verify(messageRepository).deleteById(any());
         }
 
-        // TODO: integration test(???) - check if the persistent conversation does not contain the message after removing it
+        // TODO: integration test(???) - check if the persistent conversation does not contain the
+        //       message after removing it
         @Test
         @DisplayName("removes the Message from the Conversation")
         void removesTheMessageFromTheConversation() {

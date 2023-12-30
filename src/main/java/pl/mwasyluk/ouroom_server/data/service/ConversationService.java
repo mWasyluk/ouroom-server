@@ -1,8 +1,20 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import pl.mwasyluk.ouroom_server.data.repository.ConversationRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
 import pl.mwasyluk.ouroom_server.domain.message.Conversation;
@@ -11,13 +23,10 @@ import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
 import pl.mwasyluk.ouroom_server.util.DebugLogger;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.CANNOT_ADD_MESSAGE_TO_CONVERSATION;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.CONVERSATION_CONFLICT;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.INVALID_CONVERSATION_PARTICIPATORS;
+import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponseMessages.OK;
 
 @Service
 @RequiredArgsConstructor
@@ -79,12 +88,8 @@ public class ConversationService {
         List<UUID> participatorIds = participatorIdsWithoutDuplicates.stream()
                 .map(Profile::getId)
                 .collect(Collectors.toList());
-        List<Conversation> byParticipators = conversationRepository.findByParticipatorsIdIn(participatorIds); // TODO:
-                                                                                                              // If the
-                                                                                                              // result
-                                                                                                              // can be
-                                                                                                              // turbo
-                                                                                                              // big?
+        List<Conversation> byParticipators = conversationRepository.findByParticipatorsIdIn(participatorIds);
+        // TODO: If the result can be turbo big?
         Conversation conversationWithExactParticipators = getConversationWithExactParticipators(byParticipators,
                 participatorIds);
 
@@ -105,15 +110,11 @@ public class ConversationService {
     }
 
     /**
-     * The method filters the given as the first argument Collection <Conversation>.
-     * It looks for Collections containing exactly the same participators list as
-     * the second
-     * argument to Collection <UUID> participatorIds.
-     * If the result list of matching Conversation objects is greater than 1, the
-     * method post the error
-     * log and continues its work without any more actions specific for the case.
-     * The log message contains
-     * all IDs of the Conversation objects that contain the same participators.
+     * The method filters the given as the first argument Collection <Conversation>. It looks for Collections containing
+     * exactly the same participators list as the second argument to Collection <UUID> participatorIds. If the result
+     * list of matching Conversation objects is greater than 1, the method post the error log and continues its work
+     * without any more actions specific for the case. The log message contains all IDs of the Conversation objects that
+     * contain the same participators.
      **/
     private Conversation getConversationWithExactParticipators(@NonNull Collection<Conversation> conversations,
             @NonNull Collection<UUID> participatorIds) {
@@ -132,11 +133,11 @@ public class ConversationService {
                     .map(Conversation::getId)
                     .map(Objects::toString)
                     .collect(Collectors.joining(" and "));
-            // TODO for v.2.0: send to Kafka's topic + build an application that sends me a
-            // notification
-            // every time an error is reported
+
+            // TODO v.2.0: send to Kafka's topic + build an application that sends me a  notification every time an
+            //             error is reported
             log.error("The Data Base is containing multiply conversations for same participators. Conversations IDs:\n"
-                    + conversationsIdsForError);
+                      + conversationsIdsForError);
         }
 
         if (matchingConversations.size() >= 1) {
@@ -147,7 +148,8 @@ public class ConversationService {
     }
 
     public ServiceResponse<?> addMessageToConversationById(@NonNull UUID requestingProfileUuid,
-            @NonNull UUID conversationId, @NonNull Message messageToAdd) {
+            @NonNull UUID conversationId,
+            @NonNull Message messageToAdd) {
         ServiceResponse<?> conversationServiceResponseById = getById(requestingProfileUuid, conversationId);
 
         // check if the response contains a Conversation object
@@ -181,7 +183,8 @@ public class ConversationService {
     }
 
     public ServiceResponse<?> addMessageToConversationById(@NonNull UUID requestingProfileUuid,
-            @NonNull String conversationStringUuid, @NonNull Message messageToPersist) {
+            @NonNull String conversationStringUuid,
+            @NonNull Message messageToPersist) {
         if (!UuidUtils.isStringCorrectUuid(conversationStringUuid)) {
             return ServiceResponse.INCORRECT_ID;
         }
@@ -189,13 +192,11 @@ public class ConversationService {
                 messageToPersist);
     }
 
-    // TODO: save requesting Profile to list of participators which have deleted
-    // this conversation.
-    // Check if the request is already sent form all participators.
-    // if true -> remove conversation;
-    // else -> add Profile the to Conversation's list of Profiles that have
-    // requested deletion;
-    // Tests then...
+    // TODO: save requesting Profile to list of participators which have deleted this conversation.
+    //       Check if the request is already sent form all participators.
+    //          true -> remove conversation;
+    //          false -> add Profile the to Conversation's list of Profiles that have requested deletion;
+    //       Tests then...
     public ServiceResponse<?> deleteConversationById(@NonNull UUID requestingProfileUuid,
             @NonNull UUID conversationId) {
         ServiceResponse<?> byId = getById(requestingProfileUuid, conversationId);

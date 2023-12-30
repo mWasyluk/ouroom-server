@@ -1,19 +1,19 @@
 package pl.mwasyluk.ouroom_server.web.websocket;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import pl.mwasyluk.ouroom_server.data.repository.ConversationRepository;
-import pl.mwasyluk.ouroom_server.domain.message.Conversation;
-import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
-
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import pl.mwasyluk.ouroom_server.data.repository.ConversationRepository;
+import pl.mwasyluk.ouroom_server.domain.message.Conversation;
+import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
 
 @RequiredArgsConstructor
 @Component

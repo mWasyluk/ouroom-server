@@ -1,5 +1,14 @@
 package pl.mwasyluk.ouroom_server.data.service;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.format.datetime.DateFormatter;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -8,9 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.format.datetime.DateFormatter;
 
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import pl.mwasyluk.ouroom_server.data.repository.AccountRepository;
 import pl.mwasyluk.ouroom_server.data.repository.ProfileRepository;
 import pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse;
@@ -20,13 +27,12 @@ import pl.mwasyluk.ouroom_server.domain.userdetails.Profile;
 import pl.mwasyluk.ouroom_server.domain.userdetails.ProfileAvatar;
 import pl.mwasyluk.ouroom_server.util.UuidUtils;
 
-import java.io.IOException;
-import java.util.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse.INCORRECT_ID;
 import static pl.mwasyluk.ouroom_server.data.service.support.ServiceResponse.UNAUTHORIZED;
 
@@ -96,7 +102,8 @@ class ProfileServiceTest {
     class CreateProfileMethodTest {
         @Test
         @DisplayName("returns INCORRECT_ID when the Account with the given UUID does not exist")
-        void returnsIncorrectIdWhenTheAccountWithTheGivenUuidDoesNotExist() throws HttpMediaTypeNotSupportedException, IOException {
+        void returnsIncorrectIdWhenTheAccountWithTheGivenUuidDoesNotExist()
+                throws HttpMediaTypeNotSupportedException, IOException {
             when(accountRepository.findById(any())).thenReturn(Optional.empty());
 
             ServiceResponse<?> serviceResponse = profileService.createProfile(UUID.randomUUID(), testProfile, null);
@@ -107,7 +114,8 @@ class ProfileServiceTest {
 
         @Test
         @DisplayName("returns ALREADY_EXISTS when the Account with the given UUID already has a Profile assigned")
-        void returnsAlreadyExistsWhenTheAccountWithTheGivenUuidAlreadyHasAProfileAssigned() throws HttpMediaTypeNotSupportedException, IOException {
+        void returnsAlreadyExistsWhenTheAccountWithTheGivenUuidAlreadyHasAProfileAssigned()
+                throws HttpMediaTypeNotSupportedException, IOException {
             Account account = new Account();
             account.setProfile(testProfile);
             when(accountRepository.findById(any())).thenReturn(Optional.of(account));
@@ -135,7 +143,8 @@ class ProfileServiceTest {
 
         @Test
         @DisplayName("saves and returns the Profile when it has been assigned to the Account")
-        void savesAndReturnsTheProfileWhenItHasBeenAssignedToTheAccount() throws HttpMediaTypeNotSupportedException, IOException {
+        void savesAndReturnsTheProfileWhenItHasBeenAssignedToTheAccount()
+                throws HttpMediaTypeNotSupportedException, IOException {
             Account account = new Account();
             account.setProfile(null);
             when(accountRepository.findById(any())).thenReturn(Optional.of(account));
@@ -156,7 +165,8 @@ class ProfileServiceTest {
         void returnsIncorrectIdWhenTheProfileUpdateDoesNotContainAUuid() {
             testProfile.setId(null);
 
-            assertThatThrownBy(() -> profileService.updateProfile(testProfile.getId(), testProfile)).isExactlyInstanceOf(NullPointerException.class);
+            assertThatThrownBy(() -> profileService.updateProfile(testProfile.getId(), testProfile))
+                    .isExactlyInstanceOf(NullPointerException.class);
             verify(profileRepository, never()).findById(any());
         }
 
@@ -171,7 +181,8 @@ class ProfileServiceTest {
         }
 
         @Test
-        @DisplayName("returns UNAUTHORIZED when the given Profile's UUID is different from the Profile's UUID of the requesting user")
+        @DisplayName("returns UNAUTHORIZED when the given Profile's UUID is different from the Profile's UUID of the " +
+                     "requesting user")
         void returnsUnauthorizedWhenTheGivenProfileSUuidIsDifferentFromTheProfileSUuidOfTheRequestingUser() {
             when(profileRepository.findById(any())).thenReturn(Optional.of(testProfile));
 
