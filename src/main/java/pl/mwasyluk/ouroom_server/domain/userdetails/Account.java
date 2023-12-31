@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -127,16 +128,10 @@ public class Account implements UserDetails {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class AccountRegistrationForm {
         private String email;
         private String password;
-
-        public AccountRegistrationForm() {
-        }
-
-        public AccountRegistrationForm(String email, String password) {
-            this.email = email;
-            this.password = password;
-        }
     }
 }
