@@ -1,6 +1,5 @@
 package pl.mwasyluk.ouroom_server.newdomain.member;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -40,22 +39,16 @@ public abstract class BaseMember extends Identifiable implements Member {
     @Convert(converter = MemberPrivilegeSetConverter.class)
     protected EnumSet<MemberPrivilege> privileges;
 
-    protected BaseMember(@NonNull User user, @NonNull Set<MemberPrivilege> privileges) {
+    protected BaseMember(@NonNull User user, Set<MemberPrivilege> privileges) {
         this.user = user;
-        this.privileges = EnumSet.copyOf(privileges);
+        setPrivileges(privileges);
     }
 
-    @NonNull
     @Override
-    public Set<MemberPrivilege> getPrivileges() {
-        return Collections.unmodifiableSet(privileges);
-    }
-
-    public boolean setPrivileges(@NonNull Set<MemberPrivilege> privileges) {
-        if (privileges.isEmpty()) {
-            return false;
-        }
-        this.privileges = EnumSet.copyOf(privileges);
+    public boolean setPrivileges(Set<MemberPrivilege> privileges) {
+        this.privileges = privileges == null || privileges.isEmpty()
+                ? EnumSet.noneOf(MemberPrivilege.class)
+                : EnumSet.copyOf(privileges);
         return true;
     }
 

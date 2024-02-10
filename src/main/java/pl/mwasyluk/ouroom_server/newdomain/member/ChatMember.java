@@ -14,6 +14,11 @@ import pl.mwasyluk.ouroom_server.newdomain.container.Chat;
 import pl.mwasyluk.ouroom_server.newdomain.container.Membership;
 import pl.mwasyluk.ouroom_server.newdomain.user.User;
 
+/**
+ Chat member is an entity that connects chat with its member users and their privileges.
+ <br> Member privilege set can be empty (the user can only read messages) or contain any of available
+ {@link MemberPrivilege}. A member with all available privileges is considered a chat admin.
+ */
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,7 +28,7 @@ public class ChatMember extends BaseMember {
     @ManyToOne(targetEntity = Chat.class)
     private Membership membership;
 
-    protected ChatMember(@NonNull User user, @NonNull Set<MemberPrivilege> privileges) {
+    protected ChatMember(@NonNull User user, Set<MemberPrivilege> privileges) {
         super(user, privileges);
     }
 
