@@ -9,8 +9,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToOne;
 
 import pl.mwasyluk.ouroom_server.newdomain.Presentable;
 import pl.mwasyluk.ouroom_server.newdomain.media.Image;
@@ -19,27 +20,25 @@ import pl.mwasyluk.ouroom_server.newdomain.media.Image;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
-@Entity
-@Table(name = "user_profiles")
+@Embeddable
 public class UserProfile implements Presentable {
     @NonNull
     @Setter(AccessLevel.PROTECTED)
-    private String firstName;
+    private String firstname;
     @NonNull
     @Setter(AccessLevel.PROTECTED)
-    private String lastName;
+    private String lastname;
     @NonNull
     @Setter(AccessLevel.PROTECTED)
     private LocalDate birthDate;
 
-    public UserProfile(@NonNull String firstName, @NonNull String lastName, @NonNull LocalDate birthDate) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-    }
+    @OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
+    private Image image;
 
-    public void setImage(Image image) {
-        super.image = image;
+    public UserProfile(@NonNull String firstname, @NonNull String lastname, @NonNull LocalDate birthDate) {
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.birthDate = birthDate;
     }
 
     public long getAge() {
@@ -48,6 +47,6 @@ public class UserProfile implements Presentable {
 
     @Override
     public String getName() {
-        return firstName + " " + lastName;
+        return firstname + " " + lastname;
     }
 }

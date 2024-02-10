@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
@@ -27,10 +26,10 @@ import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
 public class User extends Identifiable implements UserDetails {
     @NonNull
     @Setter(AccessLevel.PROTECTED)
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
+    @Embedded
     protected UserAccount account;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @Embedded
     protected UserProfile profile;
 
     public String getProvider() {

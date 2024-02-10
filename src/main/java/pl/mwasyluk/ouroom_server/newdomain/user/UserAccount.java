@@ -11,19 +11,16 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.Embeddable;
 
-import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
 import pl.mwasyluk.ouroom_server.newdomain.converter.AuthoritySetConverter;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
-@Entity
-@Table(name = "user_accounts")
-public class UserAccount extends Identifiable {
+@Embeddable
+public class UserAccount {
 
     @NonNull
     private String email;
@@ -61,17 +58,11 @@ public class UserAccount extends Identifiable {
         this.provider = "LOCAL";
     }
 
-    @Override
     public @NonNull Set<UserAuthority> getAuthorities() {
         return Collections.unmodifiableSet(authorities);
     }
 
     public void setAuthorities(Set<UserAuthority> authorities) {
         this.authorities = EnumSet.copyOf(authorities);
-    }
-
-    @Override
-    public String getUsername() {
-        return getEmail();
     }
 }
