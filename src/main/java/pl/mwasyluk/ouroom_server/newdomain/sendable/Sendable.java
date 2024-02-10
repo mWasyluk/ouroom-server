@@ -20,7 +20,8 @@ public interface Sendable {
     boolean isEdited();
 
     boolean updateState(SendableState newState);
-    boolean updateContent(String message, Media media);
+    boolean updateMessage(String newMessage);
+    boolean updateMedia(Media newMedia);
 
     SendablesContainer getContainer();
     boolean setContainer(SendablesContainer sendablesContainer);
