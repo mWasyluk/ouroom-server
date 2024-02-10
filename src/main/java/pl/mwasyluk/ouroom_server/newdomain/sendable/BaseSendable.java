@@ -61,14 +61,13 @@ public abstract class BaseSendable extends Identifiable implements Sendable {
 
     protected BaseSendable(@NonNull User creator, String message, Media media) {
         if (!isValid(message, media)) {
-            throw new IllegalArgumentException("ChatSendable requires a non-empty message or a non-null media");
+            throw new IllegalArgumentException("Cannot instantiate Sendable without a valid content.");
         }
+        setMessage(message);
+        setMedia(media);
+        updateTypeBasedOnContent();
 
         this.creator = creator;
-        this.message = message;
-        this.media = media;
-        this.updateTypeBasedOnContent();
-
         this.createdAt = LocalDateTime.now();
         this.state = SendableState.CREATED;
     }

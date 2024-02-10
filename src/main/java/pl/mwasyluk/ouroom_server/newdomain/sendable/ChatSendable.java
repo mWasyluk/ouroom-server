@@ -15,6 +15,11 @@ import pl.mwasyluk.ouroom_server.newdomain.container.SendablesContainer;
 import pl.mwasyluk.ouroom_server.newdomain.media.Media;
 import pl.mwasyluk.ouroom_server.newdomain.user.User;
 
+/**
+ Chat sendable is a flexible entity that can contain a text message and a reference to media entity.
+ <br> The text message is nullable but never blank String object (trimmed during instantiation or update).
+ <br> The media entity is optional for not blank text messages, otherwise mandatory.
+ */
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,22 +35,14 @@ public class ChatSendable extends BaseSendable {
         super(creator, message, media);
     }
 
-    @Override
-    protected boolean isValid(String message, Media media) {
-        if (media == null || media.getContentSize() <= 0) {
-            return message != null && !message.isBlank();
-        }
-        return true;
+    protected String validateMessage(String message) {
+        return message == null || message.isBlank() ? null : message.trim();
     }
 
-    /**
-     {@inheritDoc}<br> <b>The method is safe to use with any value</b, but does not allow to reduce the state.>
+    protected Media validateMedia(Media media) {
+        return media == null || media.getContentSize() <= 0 ? null : media;
+    }
 
-     @param newState
-     the new {@link SendableState SendableState } enum value to be applied
-
-     @return true - if the
-     */
     @Override
     public boolean updateState(SendableState newState) {
         if (newState != null && state.ordinal() <= newState.ordinal()) {
@@ -55,45 +52,33 @@ public class ChatSendable extends BaseSendable {
         return false;
     }
 
-    /**
-     {@inheritDoc}<br> <b>The method is safe to use with any values</b>, even those that are equal to the current ones.
-     In this case, this method ensures none of the fields of this instance will be overwritten, including
-     {@link #edited}.
-
-     @param message
-     {@link String} value with the message to be applied
-     @param media
-     {@link Media} instance to be applied
-
-     @return false - if the given values are not valid due to {@link #isValid}
-     <br>    true - otherwise (does not guarantee that the fields of this instance will change at all)
-     */
     @Override
-    public boolean updateContent(String message, Media media) {
-        if (!isValid(message, media)) {
+    public boolean updateMessage(String newMessage) {
+        if (!isValid(newMessage, this.media)) {
             return false;
         }
+        String validatedMessage = validateMessage(newMessage);
 
-        boolean isUpdated = false;
-        if (message != null && !message.isBlank() && !message.trim().equals(this.message)) {
-            this.message = message.trim();
-            isUpdated = true;
-        } else if (message == null && this.message != null) {
-            this.message = null;
-            isUpdated = true;
-        }
-
-        if ((this.media != null && media == null)
-            || (media != null && !media.equals(this.media))) {
-            this.media = media;
-            isUpdated = true;
-        }
-
-        if (isUpdated) {
-            this.updateTypeBasedOnContent();
+        if (this.message != null && !this.message.equals(validatedMessage)
+            || this.message == null && validatedMessage != null) {
+            this.message = validatedMessage;
             this.edited = true;
         }
+        return true;
+    }
 
+    @Override
+    public boolean updateMedia(Media newMedia) {
+        if (!isValid(this.message, newMedia)) {
+            return false;
+        }
+        Media validatedMedia = validateMedia(newMedia);
+
+        if (this.media != null && !this.media.equals(validatedMedia)
+            || this.media == null && validatedMedia != null) {
+            this.media = validatedMedia;
+            this.edited = true;
+        }
         return true;
     }
 
@@ -106,5 +91,20 @@ public class ChatSendable extends BaseSendable {
     public boolean setContainer(@NonNull SendablesContainer container) {
         this.container = container;
         return true;
+    }
+
+    @Override
+    protected void setMedia(Media media) {
+        this.media = validateMedia(media);
+    }
+
+    @Override
+    protected void setMessage(String message) {
+        this.message = validateMessage(message);
+    }
+
+    @Override
+    protected boolean isValid(String message, Media media) {
+        return validateMessage(message) != null || validateMedia(media) != null;
     }
 }
