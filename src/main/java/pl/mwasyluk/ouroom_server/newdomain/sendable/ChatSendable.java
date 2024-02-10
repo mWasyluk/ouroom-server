@@ -1,14 +1,14 @@
 package pl.mwasyluk.ouroom_server.newdomain.sendable;
 
-import java.util.Arrays;
-
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import pl.mwasyluk.ouroom_server.newdomain.container.Chat;
 import pl.mwasyluk.ouroom_server.newdomain.container.SendablesContainer;
@@ -20,6 +20,7 @@ import pl.mwasyluk.ouroom_server.newdomain.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
+@Table(indexes = {@Index(name = "containers_index", columnList = "container_id")})
 public class ChatSendable extends BaseSendable {
 
     @ManyToOne(targetEntity = Chat.class)
@@ -31,7 +32,7 @@ public class ChatSendable extends BaseSendable {
 
     @Override
     protected boolean isValid(String message, Media media) {
-        if (media == null || media.getBytesSize() <= 0) {
+        if (media == null || media.getContentSize() <= 0) {
             return message != null && !message.isBlank();
         }
         return true;
@@ -74,14 +75,16 @@ public class ChatSendable extends BaseSendable {
         }
 
         boolean isUpdated = false;
-        if ((message != null && !message.isBlank() && !message.equals(this.message))
-            || (message == null && this.message != null)) {
-            this.message = message == null ? null : message.trim();
+        if (message != null && !message.isBlank() && !message.trim().equals(this.message)) {
+            this.message = message.trim();
+            isUpdated = true;
+        } else if (message == null && this.message != null) {
+            this.message = null;
             isUpdated = true;
         }
+
         if ((this.media != null && media == null)
-            || (media != null && !media.equals(this.media) && !Arrays.equals(media.getBytes(),
-                this.media.getBytes()))) {
+            || (media != null && !media.equals(this.media))) {
             this.media = media;
             isUpdated = true;
         }
