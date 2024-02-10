@@ -1,7 +1,8 @@
 package pl.mwasyluk.ouroom_server.newdomain.media;
 
-import java.util.Optional;
+import java.util.Set;
 
+import org.springframework.http.MediaType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,27 +14,21 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Video extends BaseMedia {
-    public static boolean isFormatSupported(MediaGroup.Format format) {
-        return MediaGroup.VIDEO.getFormats().contains(format);
-    }
+    public static Set<MediaType> SUPPORTED_MEDIA_TYPES = Set.of(
+            VideoMediaType.MP4,
+            VideoMediaType.MPEG
+    );
 
-    public static boolean isFormatSupported(String format) {
-        Optional<MediaGroup.Format> match = MediaGroup.VIDEO.getFormats()
-                .stream()
-                .filter(f -> f.getMimeType().equals(format))
-                .findFirst();
-        return match.isPresent();
-    }
-
-    public Video(MediaGroup.Format format, byte[] bytes) {
-        super(format, bytes);
-        if (!isFormatSupported(format)) {
-            throw new IllegalArgumentException("Format '" + format + "' is not supported for images.");
-        }
+    protected Video(@NonNull MediaType mediaType, byte @NonNull [] content) {
+        super(mediaType, content);
     }
 
     @Override
-    public @NonNull MediaGroup getMediaGroup() {
-        return MediaGroup.VIDEO;
+    protected void validate() {
+        super.validate();
+        if (!SUPPORTED_MEDIA_TYPES.contains(this.getType())) {
+            throw new IllegalArgumentException(
+                    "Cannot instantiate Video object with " + this.getType() + " media type.");
+        }
     }
 }

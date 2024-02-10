@@ -1,5 +1,6 @@
 package pl.mwasyluk.ouroom_server.newdomain.media;
 
+import org.springframework.http.MediaType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
@@ -26,23 +24,28 @@ import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
 @Table(name = "media")
 public abstract class BaseMedia extends Identifiable implements Media {
 
-    @NonNull
     @Setter(AccessLevel.PRIVATE)
-    @Enumerated(EnumType.STRING)
-    private MediaGroup.Format format;
+    @ToString.Include
+    private @NonNull MediaType type;
 
     @Setter(AccessLevel.PRIVATE)
-    @ToString.Exclude
-    private byte @NonNull [] bytes;
+    private byte @NonNull [] content;
 
-    public BaseMedia(@NonNull MediaGroup.Format format, byte @NonNull [] bytes) {
-        this.format = format;
-        this.bytes = bytes;
+    protected BaseMedia(@NonNull MediaType type, byte @NonNull [] content) {
+        this.type = type;
+        this.content = content;
+        validate();
+    }
+
+    protected void validate() {
+        if (getContentSize() <= 0) {
+            throw new IllegalArgumentException("Cannot instantiate Media object with empty content.");
+        }
     }
 
     @Override
-    @ToString.Include(name = "bytesSize")
-    public int getBytesSize() {
-        return bytes.length;
+    @ToString.Include(name = "contentSize")
+    public int getContentSize() {
+        return content.length;
     }
 }

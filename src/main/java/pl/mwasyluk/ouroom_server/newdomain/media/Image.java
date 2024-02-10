@@ -1,7 +1,8 @@
 package pl.mwasyluk.ouroom_server.newdomain.media;
 
-import java.util.Optional;
+import java.util.Set;
 
+import org.springframework.http.MediaType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,27 +14,22 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Image extends BaseMedia {
-    public static boolean isFormatSupported(MediaGroup.Format format) {
-        return MediaGroup.IMAGE.getFormats().contains(format);
-    }
+    public static Set<MediaType> SUPPORTED_MEDIA_TYPES = Set.of(
+            MediaType.IMAGE_JPEG,
+            MediaType.IMAGE_PNG,
+            MediaType.IMAGE_GIF
+    );
 
-    public static boolean isFormatSupported(String format) {
-        Optional<MediaGroup.Format> match = MediaGroup.IMAGE.getFormats()
-                .stream()
-                .filter(f -> f.getMimeType().equals(format))
-                .findFirst();
-        return match.isPresent();
-    }
-
-    public Image(@NonNull MediaGroup.Format format, byte[] bytes) {
-        super(format, bytes);
-        if (!isFormatSupported(format)) {
-            throw new IllegalArgumentException("Format '" + format + "' is not supported for images");
-        }
+    protected Image(@NonNull MediaType mediaType, byte @NonNull [] bytes) {
+        super(mediaType, bytes);
     }
 
     @Override
-    public @NonNull MediaGroup getMediaGroup() {
-        return MediaGroup.IMAGE;
+    protected void validate() {
+        super.validate();
+        if (!SUPPORTED_MEDIA_TYPES.contains(this.getType())) {
+            throw new IllegalArgumentException(
+                    "Cannot instantiate Image object with " + this.getType() + " media type.");
+        }
     }
 }
