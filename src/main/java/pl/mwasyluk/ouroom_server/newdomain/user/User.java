@@ -1,6 +1,7 @@
 package pl.mwasyluk.ouroom_server.newdomain.user;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import lombok.AccessLevel;
@@ -24,6 +25,20 @@ import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
 @Entity
 @Table(name = "users")
 public class User extends Identifiable implements UserDetails {
+
+    /**
+     @param id
+     id to be set as the mock User's id;
+
+     @return Mock User instance which should only be used after verifying that User with the given id exists in the
+     database.
+     */
+    public static User mockOf(UUID id) {
+        User user = new User();
+        user.setId(id);
+        return user;
+    }
+
     @NonNull
     @Setter(AccessLevel.PROTECTED)
     @Embedded
