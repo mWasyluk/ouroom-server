@@ -13,7 +13,6 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
-import pl.mwasyluk.ouroom_server.newdomain.container.Membership;
 import pl.mwasyluk.ouroom_server.newdomain.converter.MemberPrivilegeSetConverter;
 import pl.mwasyluk.ouroom_server.newdomain.user.User;
 
