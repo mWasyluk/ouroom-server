@@ -24,8 +24,9 @@ import pl.mwasyluk.ouroom_server.newdomain.user.User;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "members", indexes = {
         @Index(name = "users_index", columnList = "user_id"),
-        @Index(name = "memberships_index", columnList = "membership_id"),
-})
+        @Index(name = "memberships_index", columnList = "membership_id")},
+       uniqueConstraints = @UniqueConstraint(name = "uniqueUserAndMembership",
+                                             columnNames = {"user_id", "membership_id"}))
 public abstract class BaseMember extends Identifiable implements Member {
 
     @NonNull

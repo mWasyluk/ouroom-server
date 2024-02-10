@@ -8,9 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 import pl.mwasyluk.ouroom_server.newdomain.container.Chat;
 import pl.mwasyluk.ouroom_server.newdomain.container.Membership;
@@ -21,10 +19,6 @@ import pl.mwasyluk.ouroom_server.newdomain.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
-//@Table(indexes = {
-//        @Index(name = "users_index", columnList = "user_id"),
-//        @Index(name = "memberships_index", columnList = "membership_id"),
-//})
 public class ChatMember extends BaseMember {
     @ManyToOne(targetEntity = Chat.class)
     private Membership membership;
