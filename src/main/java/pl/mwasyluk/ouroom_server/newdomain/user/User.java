@@ -1,5 +1,8 @@
 package pl.mwasyluk.ouroom_server.newdomain.user;
 
+import java.util.Collection;
+
+import org.springframework.security.core.userdetails.UserDetails;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +24,7 @@ import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
 
 @Entity
 @Table(name = "users")
-public class User extends Identifiable {
+public class User extends Identifiable implements UserDetails {
     @NonNull
     @Setter(AccessLevel.PROTECTED)
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
@@ -29,4 +32,43 @@ public class User extends Identifiable {
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     protected UserProfile profile;
+
+    public String getProvider() {
+        return account.getProvider();
+    }
+
+    @Override
+    public Collection<UserAuthority> getAuthorities() {
+        return account.getAuthorities();
+    }
+
+    @Override
+    public String getPassword() {
+        return account.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return account.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return account.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return account.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return account.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return account.isEnabled();
+    }
 }

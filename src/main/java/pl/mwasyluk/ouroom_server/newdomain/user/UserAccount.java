@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,13 +23,17 @@ import pl.mwasyluk.ouroom_server.newdomain.converter.AuthoritySetConverter;
 
 @Entity
 @Table(name = "user_accounts")
-public class UserAccount extends Identifiable implements UserDetails {
+public class UserAccount extends Identifiable {
 
     @NonNull
     private String email;
 
     @NonNull
     private String password;
+
+    // TODO: provide enum type
+    @NonNull
+    private String provider;
 
     @NonNull
     @Column(length = 16)
@@ -55,6 +58,7 @@ public class UserAccount extends Identifiable implements UserDetails {
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
         this.enabled = true;
+        this.provider = "LOCAL";
     }
 
     @Override
