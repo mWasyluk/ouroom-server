@@ -21,7 +21,7 @@ import pl.mwasyluk.ouroom_server.newdomain.media.Image;
 
 @Entity
 @Table(name = "user_profiles")
-public class UserProfile extends Presentable {
+public class UserProfile implements Presentable {
     @NonNull
     @Setter(AccessLevel.PROTECTED)
     private String firstName;

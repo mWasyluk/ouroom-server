@@ -1,23 +1,21 @@
 package pl.mwasyluk.ouroom_server.newdomain.container;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.OneToOne;
 
+import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
 import pl.mwasyluk.ouroom_server.newdomain.Presentable;
 import pl.mwasyluk.ouroom_server.newdomain.media.Image;
 
-@ToString
+@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
 @MappedSuperclass
-public abstract class BaseConversation extends Presentable implements Conversation {
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
-    }
+public abstract class BaseConversation extends Identifiable implements Conversation, Presentable {
+    private String name;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private Image image;
 }
