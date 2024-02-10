@@ -13,7 +13,7 @@ public interface Member {
     @NonNull User getUser();
 
     @NonNull Set<MemberPrivilege> getPrivileges();
-    boolean updatePrivileges(@NonNull Member member);
+    boolean setPrivileges(@NonNull Set<MemberPrivilege> privileges);
     boolean hasPrivileges(@NonNull Set<MemberPrivilege> privileges);
 
     Membership getMembership();

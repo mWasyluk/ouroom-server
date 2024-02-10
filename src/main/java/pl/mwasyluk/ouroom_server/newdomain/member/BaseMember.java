@@ -13,6 +13,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 import pl.mwasyluk.ouroom_server.newdomain.Identifiable;
+import pl.mwasyluk.ouroom_server.newdomain.container.Membership;
 import pl.mwasyluk.ouroom_server.newdomain.converter.MemberPrivilegeSetConverter;
 import pl.mwasyluk.ouroom_server.newdomain.user.User;
 
@@ -51,8 +52,12 @@ public abstract class BaseMember extends Identifiable implements Member {
         return Collections.unmodifiableSet(privileges);
     }
 
-    protected void setPrivileges(Set<MemberPrivilege> privileges) {
+    public boolean setPrivileges(@NonNull Set<MemberPrivilege> privileges) {
+        if (privileges.isEmpty()) {
+            return false;
+        }
         this.privileges = EnumSet.copyOf(privileges);
+        return true;
     }
 
     @Override

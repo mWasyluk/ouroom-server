@@ -28,18 +28,6 @@ public class ChatMember extends BaseMember {
     }
 
     @Override
-    public boolean updatePrivileges(@NonNull Member member) {
-        if (this.equals(member)) {
-            setPrivileges(member.getPrivileges());
-            return true;
-        }
-
-        log.debug("Trying to update this Member instance with another instance that contains different id or userId. "
-                  + logUtils.somethingUnexpectedAndInvolved(this, member));
-        return false;
-    }
-
-    @Override
     public boolean setMembership(Membership membership) {
         this.membership = membership;
         return true;
