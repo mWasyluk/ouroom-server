@@ -2,7 +2,6 @@ package pl.mwasyluk.ouroom_server.newdomain.container;
 
 import java.util.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,22 +18,32 @@ import pl.mwasyluk.ouroom_server.newdomain.member.ChatMemberFactory;
 import pl.mwasyluk.ouroom_server.newdomain.member.Member;
 import pl.mwasyluk.ouroom_server.newdomain.member.MemberPrivilege;
 import pl.mwasyluk.ouroom_server.newdomain.sendable.ChatSendable;
+import pl.mwasyluk.ouroom_server.newdomain.sendable.ChatSendableFactory;
 import pl.mwasyluk.ouroom_server.newdomain.sendable.Sendable;
 import pl.mwasyluk.ouroom_server.newdomain.user.User;
 
+/**
+ Chat is an entity that holds members and messages sent by them to that particular group.
+ <br> A Chat handles member creation on its own at a client's request based on the given {@link User} and
+ {@link MemberPrivilege} set.
+ <br> It is different with {@link Sendable}s, the Chat receives ready-made instances, assign them to the Chat instance
+ and stores.
+ <br><B>Every chat instance should have at least one admin</B>. This can be helped by calling the
+ {@link Chat#hasAnyAdmin()} method before persisting an entity.
+ */
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
 public class Chat extends BaseConversation {
+    public static final ChatMemberFactory MEMBER_FACTORY = new ChatMemberFactory();
+    public static final ChatSendableFactory SENDABLE_FACTORY = new ChatSendableFactory();
+
     public static final EnumSet<MemberPrivilege> ADMIN_PRIVILEGES
             = EnumSet.copyOf(Arrays.asList(MemberPrivilege.values()));
-    public static final EnumSet<MemberPrivilege> MEMBER_PRIVILEGES
+    public static final EnumSet<MemberPrivilege> DEFAULT_PRIVILEGES
             = EnumSet.of(MemberPrivilege.ADD_MESSAGES);
-
-    @Autowired
-    private ChatMemberFactory memberFactory;
 
     @NonNull
     @ToString.Exclude
@@ -89,13 +98,7 @@ public class Chat extends BaseConversation {
             return false;
         }
 
-        Member newMember;
-        if (privileges == null || privileges.isEmpty()) {
-            newMember = memberFactory.create(user, MEMBER_PRIVILEGES);
-        } else {
-            newMember = memberFactory.create(user, privileges);
-        }
-
+        Member newMember = MEMBER_FACTORY.create(user, privileges);
         return members.add(newMember) && newMember.setMembership(this);
     }
 
