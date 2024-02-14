@@ -1,4 +1,4 @@
-package pl.mwasyluk.ouroom_server.domain.converter;
+package pl.mwasyluk.ouroom_server.converters;
 
 import jakarta.persistence.Converter;
 
