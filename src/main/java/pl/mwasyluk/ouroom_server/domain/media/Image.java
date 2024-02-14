@@ -1,8 +1,7 @@
 package pl.mwasyluk.ouroom_server.domain.media;
 
-import java.util.Set;
+import java.io.IOException;
 
-import org.springframework.http.MediaType;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,20 +13,18 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Image extends BaseMedia {
-    public static Set<MediaType> SUPPORTED_MEDIA_TYPES = Set.of(
-            MediaType.IMAGE_JPEG,
-            MediaType.IMAGE_PNG,
-            MediaType.IMAGE_GIF
-    );
+    protected Image(byte @NonNull [] bytes) throws IOException {
+        super(bytes);
+    }
 
-    protected Image(@NonNull MediaType mediaType, byte @NonNull [] bytes) {
-        super(mediaType, bytes);
+    protected Image(@NonNull String url) throws IOException {
+        super(url);
     }
 
     @Override
     protected void validate() {
         super.validate();
-        if (!SUPPORTED_MEDIA_TYPES.contains(this.getType())) {
+        if (!MediaUtils.isImageType(this.getType())) {
             throw new IllegalArgumentException(
                     "Cannot instantiate Image object with " + this.getType() + " media type.");
         }
