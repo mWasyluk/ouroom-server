@@ -1,8 +1,8 @@
 package pl.mwasyluk.ouroom_server.util;
 
 public class LoggerUtils {
-    public String somethingUnexpectedAndInvolved(Object... involved) {
-        var sb = new StringBuilder("Something unexpected happened. Involved instances:");
+    public static String involved(Object... involved) {
+        var sb = new StringBuilder("Involved instances:");
 
         for (Object i : involved) {
             sb.append("\n");
@@ -10,5 +10,9 @@ public class LoggerUtils {
         }
 
         return sb.toString();
+    }
+
+    public static String operationFailedDueTo(String operation, String reason, Object... involved) {
+        return "The " + operation + " operation failed due to " + reason + ". " + involved(involved);
     }
 }
