@@ -13,7 +13,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 
-import pl.mwasyluk.ouroom_server.domain.converter.AuthoritySetConverter;
+import pl.mwasyluk.ouroom_server.converters.AuthoritySetConverter;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
