@@ -11,8 +11,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import jakarta.persistence.*;
 
-import pl.mwasyluk.ouroom_server.domain.Identifiable;
 import pl.mwasyluk.ouroom_server.converters.MemberPrivilegeSetConverter;
+import pl.mwasyluk.ouroom_server.domain.Identifiable;
 import pl.mwasyluk.ouroom_server.domain.user.User;
 
 @Data
