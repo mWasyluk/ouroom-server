@@ -40,7 +40,7 @@ public class ChatSendable extends BaseSendable {
     }
 
     protected Media validateMedia(Media media) {
-        return media == null || media.getContentSize() <= 0 ? null : media;
+        return media;
     }
 
     @Override
