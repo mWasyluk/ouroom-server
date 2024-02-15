@@ -28,9 +28,8 @@ public class UserAccount {
     @NonNull
     private String password;
 
-    // TODO: provide enum type
     @NonNull
-    private String provider;
+    private AuthProvider provider;
 
     @NonNull
     @Column(length = 16)
@@ -55,7 +54,7 @@ public class UserAccount {
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
         this.enabled = true;
-        this.provider = "LOCAL";
+        this.provider = AuthProvider.LOCAL;
     }
 
     public @NonNull Set<UserAuthority> getAuthorities() {

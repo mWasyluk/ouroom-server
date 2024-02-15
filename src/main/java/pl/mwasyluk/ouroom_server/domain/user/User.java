@@ -1,6 +1,6 @@
 package pl.mwasyluk.ouroom_server.domain.user;
 
-import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,12 +47,12 @@ public class User extends Identifiable implements UserDetails {
     @Embedded
     protected UserProfile profile;
 
-    public String getProvider() {
+    public AuthProvider getProvider() {
         return account.getProvider();
     }
 
     @Override
-    public Collection<UserAuthority> getAuthorities() {
+    public Set<UserAuthority> getAuthorities() {
         return account.getAuthorities();
     }
 
