@@ -1,17 +1,24 @@
 package pl.mwasyluk.ouroom_server.domain.member;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 
+import pl.mwasyluk.ouroom_server.converters.MemberPrivilegeSetConverter;
 import pl.mwasyluk.ouroom_server.domain.container.Chat;
 import pl.mwasyluk.ouroom_server.domain.container.Membership;
+import pl.mwasyluk.ouroom_server.domain.member.id.ChatMemberId;
 import pl.mwasyluk.ouroom_server.domain.user.User;
 
 /**
@@ -24,17 +31,56 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
-public class ChatMember extends BaseMember {
-    @ManyToOne(targetEntity = Chat.class)
-    private Membership membership;
+public class ChatMember implements Member {
+    @Setter(AccessLevel.PRIVATE)
+    @Getter(AccessLevel.PRIVATE)
+    @EmbeddedId
+    private ChatMemberId memberId;
 
-    protected ChatMember(@NonNull User user, Set<MemberPrivilege> privileges) {
-        super(user, privileges);
+    @NonNull
+    @Column(length = 32)
+    @Convert(converter = MemberPrivilegeSetConverter.class)
+    protected EnumSet<MemberPrivilege> privileges;
+
+    private boolean locked;
+
+    public ChatMember(@NonNull User user, @NonNull Membership membership, Set<MemberPrivilege> privileges) {
+        this.memberId = new ChatMemberId(user, (Chat) membership);
+        setPrivileges(privileges);
     }
 
     @Override
-    public boolean setMembership(Membership membership) {
-        this.membership = membership;
+    public @NonNull User getUser() {
+        return memberId.getUser();
+    }
+
+    @Override
+    public @NonNull Membership getMembership() {
+        return memberId.getMembership();
+    }
+
+    @Override
+    public boolean destroy() {
+        if (locked) {
+            return false;
+        }
+        memberId.destroy();
         return true;
+    }
+
+    @Override
+    public boolean setPrivileges(Set<MemberPrivilege> privileges) {
+        if (locked) {
+            return false;
+        }
+        this.privileges = privileges == null || privileges.isEmpty()
+                ? EnumSet.noneOf(MemberPrivilege.class)
+                : EnumSet.copyOf(privileges);
+        return true;
+    }
+
+    @Override
+    public boolean hasPrivileges(@NonNull Set<MemberPrivilege> privileges) {
+        return this.privileges.containsAll(privileges);
     }
 }
