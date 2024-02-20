@@ -1,14 +1,6 @@
 package pl.mwasyluk.ouroom_server.domain.container;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -19,14 +11,15 @@ import lombok.Setter;
 import lombok.ToString;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 import pl.mwasyluk.ouroom_server.domain.member.ChatMember;
-import pl.mwasyluk.ouroom_server.domain.member.ChatMemberFactory;
 import pl.mwasyluk.ouroom_server.domain.member.Member;
 import pl.mwasyluk.ouroom_server.domain.member.MemberPrivilege;
+import pl.mwasyluk.ouroom_server.domain.member.factory.ChatMemberFactory;
 import pl.mwasyluk.ouroom_server.domain.sendable.ChatSendable;
-import pl.mwasyluk.ouroom_server.domain.sendable.ChatSendableFactory;
 import pl.mwasyluk.ouroom_server.domain.sendable.Sendable;
 import pl.mwasyluk.ouroom_server.domain.user.User;
 
@@ -36,8 +29,8 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
  {@link MemberPrivilege} set.
  <br> It is different with {@link Sendable}s, the Chat receives ready-made instances, assign them to the Chat instance
  and stores.
- <br><B>Every chat instance should have at least one admin</B>. This can be helped by calling the
- {@link Chat#hasAnyAdmin()} method before persisting an entity.
+ <br><B>Every chat instance has an owner user</B>. This user cannot be removed from the
+ chat instance and its privileges are locked against modifications.
  */
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -45,18 +38,35 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 
 @Entity
 public class Chat extends BaseConversation {
-    public static final ChatMemberFactory MEMBER_FACTORY = new ChatMemberFactory();
-    public static final ChatSendableFactory SENDABLE_FACTORY = new ChatSendableFactory();
-
     public static final EnumSet<MemberPrivilege> ADMIN_PRIVILEGES
             = EnumSet.copyOf(Arrays.asList(MemberPrivilege.values()));
     public static final EnumSet<MemberPrivilege> DEFAULT_PRIVILEGES
             = EnumSet.of(MemberPrivilege.ADD_MESSAGES);
 
+    /**
+     @param id
+     id to be set as the mock Chat's id;
+
+     @return Mock Chat instance which should only be used after verifying that Chat with the given id exists in the
+     database.
+     */
+    public static Chat mockOf(UUID id) {
+        Chat chat = new Chat();
+        chat.setId(id);
+        return chat;
+    }
+
+    @Transient
+    private final ChatMemberFactory memberFactory = new ChatMemberFactory(this);
+
+    @Getter
+    @ManyToOne(optional = false)
+    protected User owner;
+
     @NonNull
     @ToString.Exclude
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true,
-               targetEntity = ChatMember.class, mappedBy = "membership")
+               targetEntity = ChatMember.class, mappedBy = "memberId.membership")
     protected Collection<Member> members = new ArrayList<>();
 
     @NonNull
@@ -67,11 +77,23 @@ public class Chat extends BaseConversation {
                targetEntity = ChatSendable.class, mappedBy = "container")
     protected Collection<Sendable> sendables = new ArrayList<>();
 
-    public Chat(@NonNull User adminUser, Map<User, Set<MemberPrivilege>> memberUserPrivilegesMap) {
-        this.addMember(adminUser, Chat.ADMIN_PRIVILEGES);
-        if (memberUserPrivilegesMap != null && memberUserPrivilegesMap.size() > 0) {
-            memberUserPrivilegesMap.forEach(this::addMember);
+    public Chat(@NonNull User owner) {
+        this.owner = owner;
+
+        ChatMember ownerMember = memberFactory.create(owner, ADMIN_PRIVILEGES);
+        ownerMember.setLocked(true);
+        members.add(ownerMember);
+    }
+
+    public Chat(@NonNull User owner, Map<User, Set<MemberPrivilege>> memberUserPrivilegesMap) {
+        this(owner);
+        Map<User, Set<MemberPrivilege>> targetMap = memberUserPrivilegesMap;
+        if (targetMap == null) {
+            targetMap = new HashMap<>();
+        } else {
+            targetMap.remove(owner);
         }
+        targetMap.forEach((user, privs) -> members.add(memberFactory.create(user, privs)));
     }
 
     private boolean hasAdminPrivileges(@NonNull Member member) {
@@ -83,11 +105,6 @@ public class Chat extends BaseConversation {
         return getMemberByUserId(userId)
                 .map(this::hasAdminPrivileges)
                 .orElse(false);
-    }
-
-    @Override
-    public boolean hasAnyAdmin() {
-        return members.stream().anyMatch(this::hasAdminPrivileges);
     }
 
     @Override
@@ -106,13 +123,15 @@ public class Chat extends BaseConversation {
             return false;
         }
 
-        Member newMember = MEMBER_FACTORY.create(user, privileges);
-        return members.add(newMember) && newMember.setMembership(this);
+        return members.add(memberFactory.create(user, privileges));
     }
 
     @Override
     public boolean removeMemberByUserId(@NonNull UUID userId) {
-        return members.removeIf(m -> m.getUser().getId().equals(userId) && m.setMembership(null));
+        if (userId.equals(owner.getId())) {
+            return false;
+        }
+        return members.removeIf(m -> m.getUser().getId().equals(userId) && m.destroy());
     }
 
     @Override
