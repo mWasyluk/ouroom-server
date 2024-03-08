@@ -1,8 +1,5 @@
 package pl.mwasyluk.ouroom_server.domain.user;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,21 +25,14 @@ public class UserProfile implements Presentable {
     @NonNull
     @Setter(AccessLevel.PROTECTED)
     private String lastname;
-    @NonNull
-    @Setter(AccessLevel.PROTECTED)
-    private LocalDate birthDate;
 
     @OneToOne(orphanRemoval = true, cascade = CascadeType.ALL)
     private Image image;
 
-    public UserProfile(@NonNull String firstname, @NonNull String lastname, @NonNull LocalDate birthDate) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.birthDate = birthDate;
-    }
-
-    public long getAge() {
-        return ChronoUnit.YEARS.between(birthDate, LocalDate.now());
+    public UserProfile(ProfileBuilder profileBuilder) {
+        this.firstname = profileBuilder.firstname;
+        this.lastname = profileBuilder.lastname;
+        this.image = profileBuilder.image;
     }
 
     @Override
