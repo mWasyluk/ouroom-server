@@ -14,7 +14,7 @@ import pl.mwasyluk.ouroom_server.utils.MediaUtil;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
-public class Video extends BaseMedia {
+public class Video extends Media {
     protected Video(@NonNull DataSource dataSource) {
         super(dataSource);
     }

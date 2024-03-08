@@ -14,7 +14,7 @@ import pl.mwasyluk.ouroom_server.utils.MediaUtil;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Entity
-public class Image extends BaseMedia {
+public class Image extends Media {
     protected Image(@NonNull DataSource dataSource) {
         super(dataSource);
     }
