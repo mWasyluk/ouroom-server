@@ -12,14 +12,9 @@ import jakarta.persistence.Table;
 
 import pl.mwasyluk.ouroom_server.domain.container.Chat;
 import pl.mwasyluk.ouroom_server.domain.container.SendablesContainer;
-import pl.mwasyluk.ouroom_server.domain.media.Media;
 import pl.mwasyluk.ouroom_server.domain.user.User;
+import pl.mwasyluk.ouroom_server.exceptions.InitializationException;
 
-/**
- Chat sendable is a flexible entity that can contain a text message and a reference to media entity.
- <br> The text message is nullable but never blank String object (trimmed during instantiation or update).
- <br> The media entity is optional for not blank text messages, otherwise mandatory.
- */
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,58 +22,42 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 @Entity
 @Table(indexes = {@Index(name = "containers_index", columnList = "container_id")})
 public class ChatSendable extends BaseSendable {
-
     @ManyToOne(targetEntity = Chat.class)
     protected SendablesContainer container;
 
-    protected ChatSendable(@NonNull User creator, String message, Media media) {
-        super(creator, message, media);
-    }
-
-    protected String validateMessage(String message) {
-        return message == null || message.isBlank() ? null : message.trim();
-    }
-
-    protected Media validateMedia(Media media) {
-        return media;
+    public ChatSendable(@NonNull User creator, @NonNull String message) {
+        super(creator, message);
     }
 
     @Override
-    public boolean updateState(SendableState newState) {
-        if (newState != null && state.ordinal() <= newState.ordinal()) {
-            state = newState;
-            return true;
+    protected void initMessage(String message) {
+        if (message == null || message.isBlank()) {
+            throw new InitializationException("Cannot initialize ChatSendable with an empty message.");
         }
-        return false;
+        this.message = message.trim();
     }
 
     @Override
-    public boolean updateMessage(String newMessage) {
-        if (!isValid(newMessage, this.media)) {
+    public boolean updateState(@NonNull SendableState newState) {
+        if (newState.ordinal() < this.state.ordinal()) {
             return false;
         }
-        String validatedMessage = validateMessage(newMessage);
-
-        if (this.message != null && !this.message.equals(validatedMessage)
-            || this.message == null && validatedMessage != null) {
-            this.message = validatedMessage;
-            this.edited = true;
-        }
+        this.state = newState;
         return true;
     }
 
     @Override
-    public boolean updateMedia(Media newMedia) {
-        if (!isValid(this.message, newMedia)) {
+    public boolean updateMessage(@NonNull String newMessage) {
+        if (newMessage.isBlank()) {
             return false;
         }
-        Media validatedMedia = validateMedia(newMedia);
-
-        if (this.media != null && !this.media.equals(validatedMedia)
-            || this.media == null && validatedMedia != null) {
-            this.media = validatedMedia;
-            this.edited = true;
+        String trimmed = newMessage.trim();
+        if (this.message.equals(trimmed)) {
+            return true;
         }
+
+        this.message = trimmed;
+        this.edited = true;
         return true;
     }
 
@@ -91,20 +70,5 @@ public class ChatSendable extends BaseSendable {
     public boolean setContainer(@NonNull SendablesContainer container) {
         this.container = container;
         return true;
-    }
-
-    @Override
-    protected void setMedia(Media media) {
-        this.media = validateMedia(media);
-    }
-
-    @Override
-    protected void setMessage(String message) {
-        this.message = validateMessage(message);
-    }
-
-    @Override
-    protected boolean isValid(String message, Media media) {
-        return validateMessage(message) != null || validateMedia(media) != null;
     }
 }

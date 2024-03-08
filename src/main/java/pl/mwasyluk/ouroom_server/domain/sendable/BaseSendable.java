@@ -1,6 +1,6 @@
 package pl.mwasyluk.ouroom_server.domain.sendable;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -8,17 +8,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToOne;
 
 import pl.mwasyluk.ouroom_server.domain.Identifiable;
-import pl.mwasyluk.ouroom_server.domain.media.BaseMedia;
-import pl.mwasyluk.ouroom_server.domain.media.Media;
 import pl.mwasyluk.ouroom_server.domain.user.User;
 
 @Data
@@ -27,7 +23,6 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 
 @MappedSuperclass
 public abstract class BaseSendable extends Identifiable implements Sendable {
-
     @NonNull
     @Setter(AccessLevel.PROTECTED)
     @ManyToOne(optional = false)
@@ -35,13 +30,7 @@ public abstract class BaseSendable extends Identifiable implements Sendable {
 
     @NonNull
     @Setter(AccessLevel.PROTECTED)
-    @Enumerated(EnumType.STRING)
-    @Column(length = 16)
-    protected SendableType type;
-
-    @NonNull
-    @Setter(AccessLevel.PROTECTED)
-    protected LocalDateTime createdAt;
+    protected ZonedDateTime createdAt;
 
     @NonNull
     @Setter(AccessLevel.PROTECTED)
@@ -49,32 +38,20 @@ public abstract class BaseSendable extends Identifiable implements Sendable {
     @Column(length = 16)
     protected SendableState state;
 
+    @NonNull
     @Setter(AccessLevel.PROTECTED)
+    @Column(columnDefinition = "text")
     protected String message;
-
-    @Setter(AccessLevel.PROTECTED)
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = BaseMedia.class)
-    protected Media media;
 
     @Setter(AccessLevel.PROTECTED)
     protected boolean edited;
 
-    protected BaseSendable(@NonNull User creator, String message, Media media) {
-        if (!isValid(message, media)) {
-            throw new IllegalArgumentException("Cannot instantiate Sendable without a valid content.");
-        }
-        setMessage(message);
-        setMedia(media);
-        updateTypeBasedOnContent();
-
+    protected BaseSendable(@NonNull User creator, @NonNull String message) {
+        initMessage(message);
         this.creator = creator;
-        this.createdAt = LocalDateTime.now();
-        this.state = SendableState.CREATED;
+        this.createdAt = ZonedDateTime.now();
+        this.state = SendableState.SENT;
     }
 
-    abstract protected boolean isValid(String message, Media media);
-
-    protected void updateTypeBasedOnContent() {
-        this.type = media != null ? SendableType.MEDIA : SendableType.TEXT;
-    }
+    abstract protected void initMessage(String message);
 }
