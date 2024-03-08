@@ -12,6 +12,9 @@ public interface Member {
     @NonNull Membership getMembership();
     boolean destroy();
 
+    boolean isLocked();
+    void setLocked(boolean locked);
+    
     @NonNull Set<MemberPrivilege> getPrivileges();
     boolean setPrivileges(Set<MemberPrivilege> privileges);
     boolean hasPrivileges(@NonNull Set<MemberPrivilege> privileges);
