@@ -12,6 +12,7 @@ import jakarta.persistence.OneToOne;
 
 import pl.mwasyluk.ouroom_server.domain.Presentable;
 import pl.mwasyluk.ouroom_server.domain.media.Image;
+import pl.mwasyluk.ouroom_server.exceptions.InitializationException;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -38,5 +39,42 @@ public class UserProfile implements Presentable {
     @Override
     public String getName() {
         return firstname + " " + lastname;
+    }
+
+    public static class ProfileBuilder extends User.UserPropertiesBuilder {
+        private String firstname;
+        private String lastname;
+        private Image image;
+
+        protected ProfileBuilder(@NonNull User user) {
+            super(user);
+            if (target.profile != null) {
+                firstname = target.profile.firstname;
+                lastname = target.profile.lastname;
+                image = target.profile.image;
+            }
+        }
+
+        public ProfileBuilder setFirstname(String firstname) {
+            this.firstname = firstname.trim();
+            return this;
+        }
+
+        public ProfileBuilder setLastname(String lastname) {
+            this.lastname = lastname.trim();
+            return this;
+        }
+
+        public ProfileBuilder setImage(Image image) {
+            this.image = image;
+            return this;
+        }
+
+        protected void validate() {
+            if (firstname == null || firstname.isBlank() && lastname == null || lastname.isBlank()) {
+                throw new InitializationException("User names are invalid: '" + firstname + " " + lastname + "'");
+            }
+            target.profile = new UserProfile(this);
+        }
     }
 }
