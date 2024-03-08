@@ -3,7 +3,6 @@ package pl.mwasyluk.ouroom_server.domain.media.source;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -11,6 +10,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+
+import pl.mwasyluk.ouroom_server.exceptions.ConversionException;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -29,20 +30,17 @@ public class ExternalDataSource implements DataSource {
         try {
             return url.openStream();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ConversionException("Data stream from URL '" + url + "' could not be opened");
         }
     }
 
     @Override
     public String getContentType() {
-        URLConnection urlConnection;
         try {
-            urlConnection = url.openConnection();
+            String contentType = url.openConnection().getContentType();
+            return contentType != null ? contentType : "application/octet-stream";
         } catch (IOException e) {
             return null;
         }
-
-        String contentType = urlConnection.getContentType();
-        return contentType != null ? contentType : "application/octet-stream";
     }
 }

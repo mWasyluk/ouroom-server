@@ -7,6 +7,8 @@ import lombok.NonNull;
 import jakarta.persistence.Entity;
 
 import pl.mwasyluk.ouroom_server.domain.media.source.DataSource;
+import pl.mwasyluk.ouroom_server.exceptions.InitializationException;
+import pl.mwasyluk.ouroom_server.utils.MediaUtil;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,8 +21,8 @@ public class Image extends BaseMedia {
 
     @Override
     protected void validate() {
-        if (!MediaUtils.isImageType(this.getType())) {
-            throw new IllegalArgumentException(
+        if (!MediaUtil.isImageType(getDataSource().getContentType())) {
+            throw new InitializationException(
                     "Cannot instantiate Image object with " + this.getType() + " media type.");
         }
     }

@@ -7,6 +7,8 @@ import java.net.URL;
 
 import lombok.NonNull;
 
+import pl.mwasyluk.ouroom_server.exceptions.ConversionException;
+
 public interface DataSource {
     static DataSource of(@NonNull URL url) {
         return new ExternalDataSource(url);
@@ -24,7 +26,7 @@ public interface DataSource {
         try {
             return this.getInputStream().readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ConversionException("Bytes array from the input stream could not be read.");
         }
     }
 }

@@ -1,33 +1,31 @@
 package pl.mwasyluk.ouroom_server.domain.media;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import lombok.NonNull;
 
+import pl.mwasyluk.ouroom_server.controllers.MediaController;
 import pl.mwasyluk.ouroom_server.domain.media.source.DataSource;
+import pl.mwasyluk.ouroom_server.exceptions.InitializationException;
+import pl.mwasyluk.ouroom_server.exceptions.UnexpectedStateException;
+import pl.mwasyluk.ouroom_server.utils.MediaUtil;
 
 public interface Media {
-    static Media of(@NonNull DataSource dataSource) {
-        MediaType mediaType = MediaType.parseMediaType(dataSource.getContentType());
-        if (MediaUtils.isImageType(mediaType)) {
+    static @NonNull Media of(@NonNull DataSource dataSource) {
+        if (!MediaUtil.isMimeTypeSupported(dataSource.getContentType())) {
+            throw new InitializationException("Mime type '" + dataSource.getContentType() + "' is not supported.");
+        }
+        if (MediaUtil.isImageType(dataSource.getContentType())) {
             return new Image(dataSource);
         }
-        if (MediaUtils.isVideoType(mediaType)) {
+        if (MediaUtil.isVideoType(dataSource.getContentType())) {
             return new Video(dataSource);
         }
 
-        throw new IllegalArgumentException("MediaType " + mediaType + " is not supported.");
-    }
-
-    static Media from(MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-
-        return of(DataSource.of(file.getBytes()));
+        throw new UnexpectedStateException(
+                "Mime type '" + dataSource.getContentType() + "' could not be matched with any available media type.");
     }
 
     @NonNull UUID getId();

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import pl.mwasyluk.ouroom_server.exceptions.InitializationException;
+
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +23,7 @@ public class InternalDataSource implements DataSource {
 
     protected InternalDataSource(byte @NonNull [] data) {
         if (data.length == 0) {
-            throw new IllegalArgumentException("Cannot instantiate InternalDataSource without a non-empty bytes array");
+            throw new InitializationException("Cannot instantiate InternalDataSource with an empty bytes array");
         }
         this.data = data;
     }
