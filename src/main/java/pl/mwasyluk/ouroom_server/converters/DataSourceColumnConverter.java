@@ -10,6 +10,7 @@ import jakarta.persistence.Converter;
 import pl.mwasyluk.ouroom_server.domain.media.source.DataSource;
 import pl.mwasyluk.ouroom_server.domain.media.source.ExternalDataSource;
 import pl.mwasyluk.ouroom_server.domain.media.source.InternalDataSource;
+import pl.mwasyluk.ouroom_server.exceptions.ConversionException;
 
 @Converter(autoApply = true)
 public class DataSourceColumnConverter implements AttributeConverter<DataSource, byte[]> {
@@ -24,14 +25,14 @@ public class DataSourceColumnConverter implements AttributeConverter<DataSource,
                 os.write(INTERNAL_CODE);
                 ids.getInputStream().transferTo(os);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ConversionException("InternalDataSource could not be converted to a persistable byte array.");
             }
         } else if (dataSource instanceof ExternalDataSource eds) {
             try {
                 os.write(EXTERNAL_CODE);
                 os.write(eds.getUrl().toString().getBytes());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ConversionException("ExternalDataSource could not be converted to a persistable byte array.");
             }
         }
         return os.toByteArray();
@@ -49,7 +50,7 @@ public class DataSourceColumnConverter implements AttributeConverter<DataSource,
             try {
                 return DataSource.of(os.toString());
             } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
+                throw new ConversionException("Persisted byte array could not be converted to a DataSource object.");
             }
         }
         return null;
