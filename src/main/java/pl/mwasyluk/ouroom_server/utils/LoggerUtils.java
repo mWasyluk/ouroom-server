@@ -1,4 +1,4 @@
-package pl.mwasyluk.ouroom_server.util;
+package pl.mwasyluk.ouroom_server.utils;
 
 public class LoggerUtils {
     public static String involved(Object... involved) {
