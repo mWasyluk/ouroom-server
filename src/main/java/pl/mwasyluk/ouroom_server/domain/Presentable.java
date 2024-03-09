@@ -6,6 +6,6 @@ public interface Presentable {
     String getName();
     Image getImage();
     default String getImageUrl() {
-        return getImage().getInternalUrl();
+        return getImage() == null ? null : getImage().getInternalUrl();
     }
 }
