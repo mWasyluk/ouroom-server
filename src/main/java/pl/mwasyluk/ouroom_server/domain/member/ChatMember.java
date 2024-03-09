@@ -34,6 +34,7 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 public class ChatMember implements Member {
     @Setter(AccessLevel.PRIVATE)
     @Getter(AccessLevel.PRIVATE)
+    @EqualsAndHashCode.Include
     @EmbeddedId
     private ChatMemberId memberId;
 

@@ -2,6 +2,7 @@ package pl.mwasyluk.ouroom_server.domain.member.id;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import jakarta.persistence.Embeddable;
@@ -13,11 +14,12 @@ import pl.mwasyluk.ouroom_server.domain.container.Membership;
 import pl.mwasyluk.ouroom_server.domain.user.User;
 
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 
 @Embeddable
 public class ChatMemberId extends MemberId {
-
+    @EqualsAndHashCode.Include
     @ManyToOne(targetEntity = Chat.class, fetch = FetchType.LAZY)
     private Membership membership;
 
