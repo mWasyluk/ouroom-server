@@ -7,6 +7,7 @@ import pl.mwasyluk.ouroom_server.domain.sendable.Sendable;
 
 public record SendableView(
         UUID id,
+        UUID containerId,
         UUID creatorId,
         ZonedDateTime createdAt,
         String state,
@@ -16,6 +17,7 @@ public record SendableView(
 
     public SendableView(Sendable sendable) {
         this(sendable.getId(),
+                sendable.getContainer().getId(),
                 sendable.getCreator().getId(),
                 sendable.getCreatedAt(),
                 sendable.getState().name(),
