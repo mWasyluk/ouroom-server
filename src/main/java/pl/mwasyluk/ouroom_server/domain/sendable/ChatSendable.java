@@ -38,30 +38,6 @@ public class ChatSendable extends BaseSendable {
     }
 
     @Override
-    public boolean updateState(@NonNull SendableState newState) {
-        if (newState.ordinal() < this.state.ordinal()) {
-            return false;
-        }
-        this.state = newState;
-        return true;
-    }
-
-    @Override
-    public boolean updateMessage(@NonNull String newMessage) {
-        if (newMessage.isBlank()) {
-            return false;
-        }
-        String trimmed = newMessage.trim();
-        if (this.message.equals(trimmed)) {
-            return true;
-        }
-
-        this.message = trimmed;
-        this.edited = true;
-        return true;
-    }
-
-    @Override
     public SendablesContainer getContainer() {
         return container;
     }
