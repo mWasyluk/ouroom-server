@@ -3,6 +3,7 @@ package pl.mwasyluk.ouroom_server.services.user;
 import java.util.UUID;
 
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import lombok.NonNull;
 
 import pl.mwasyluk.ouroom_server.dto.user.UserDetailsForm;
@@ -10,7 +11,7 @@ import pl.mwasyluk.ouroom_server.dto.user.UserDetailsView;
 import pl.mwasyluk.ouroom_server.dto.user.UserPresentableForm;
 import pl.mwasyluk.ouroom_server.dto.user.UserPresentableView;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
     @NonNull UserDetailsView create(@NonNull UserDetailsForm userDetailsForm);
 
     @NonNull UserDetailsView readDetails(@Nullable UUID userId);

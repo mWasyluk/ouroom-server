@@ -35,7 +35,7 @@ import static pl.mwasyluk.ouroom_server.utils.BcryptUtils.BCRYPT_PREFIX;
 @RequiredArgsConstructor
 
 @Service
-public class DefaultUserService implements UserService, UserDetailsService {
+public class DefaultUserService implements UserService {
     private final UserRepository userRepo;
 
     private void verifyPassword(String password) {
