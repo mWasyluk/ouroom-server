@@ -1,6 +1,7 @@
 package pl.mwasyluk.ouroom_server.services;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.NonNull;
 
@@ -10,7 +11,11 @@ import pl.mwasyluk.ouroom_server.exceptions.ServiceException;
 
 public class PrincipalValidator {
     private static User getPrincipalUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
         return principal instanceof User user ? user : null;
     }
 
