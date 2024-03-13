@@ -20,14 +20,20 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 import pl.mwasyluk.ouroom_server.dto.chat.ChatDetailsView;
 import pl.mwasyluk.ouroom_server.dto.chat.ChatForm;
 import pl.mwasyluk.ouroom_server.dto.chat.ChatPresentableView;
+import pl.mwasyluk.ouroom_server.dto.notification.NotificationView;
 import pl.mwasyluk.ouroom_server.exceptions.ServiceException;
 import pl.mwasyluk.ouroom_server.exceptions.UnexpectedStateException;
 import pl.mwasyluk.ouroom_server.repos.ChatRepository;
 import pl.mwasyluk.ouroom_server.services.MemberValidator;
+import pl.mwasyluk.ouroom_server.websocket.NotificationTemplate;
+import pl.mwasyluk.ouroom_server.websocket.Topic;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static pl.mwasyluk.ouroom_server.dto.notification.NotificationView.Action.CHANGED;
+import static pl.mwasyluk.ouroom_server.dto.notification.NotificationView.Action.NEW;
+import static pl.mwasyluk.ouroom_server.dto.notification.NotificationView.Action.REMOVED;
 import static pl.mwasyluk.ouroom_server.services.PrincipalValidator.validatePrincipal;
 
 @RequiredArgsConstructor
@@ -36,6 +42,12 @@ import static pl.mwasyluk.ouroom_server.services.PrincipalValidator.validatePrin
 public class DefaultChatService implements ChatService {
     private final ChatRepository chatRepo;
     private final MemberValidator memberValidator;
+    private final NotificationTemplate notificationTemplate;
+
+    private void notifyAllMembers(NotificationView.Action action, ChatPresentableView chatView) {
+        NotificationView notificationView = new NotificationView(action, chatView);
+        notificationTemplate.notifyAllMembers(chatView.id(), Topic.MEMBERSHIPS, notificationView);
+    }
 
     private void setChatPresentable(Chat chat, String chatName, boolean isClearImage, MultipartFile file) {
         chat.setName(chatName);
@@ -70,8 +82,10 @@ public class DefaultChatService implements ChatService {
         // execution
         Chat newChat = new Chat(principal);
         setChatPresentable(newChat, chatForm.getName(), false, chatForm.getFile());
+        ChatPresentableView chatPresentableView = new ChatPresentableView(chatRepo.save(newChat));
 
-        return new ChatPresentableView(chatRepo.save(newChat));
+        notifyAllMembers(NEW, chatPresentableView);
+        return chatPresentableView;
     }
 
     @Override
@@ -112,8 +126,10 @@ public class DefaultChatService implements ChatService {
         // execution
         Chat targetChat = targetChatOptional.get();
         setChatPresentable(targetChat, chatForm.getName(), chatForm.isClearImage(), chatForm.getFile());
+        ChatPresentableView chatPresentableView = new ChatPresentableView(chatRepo.save(targetChat));
 
-        return new ChatPresentableView(chatRepo.save(targetChat));
+        notifyAllMembers(CHANGED, chatPresentableView);
+        return chatPresentableView;
     }
 
     @Override
@@ -133,6 +149,7 @@ public class DefaultChatService implements ChatService {
         }
 
         // execution
+        notifyAllMembers(REMOVED, new ChatPresentableView(Chat.mockOf(chatId)));
         chatRepo.deleteById(chatId);
     }
 }

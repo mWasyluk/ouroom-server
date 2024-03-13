@@ -13,15 +13,21 @@ import pl.mwasyluk.ouroom_server.domain.container.Chat;
 import pl.mwasyluk.ouroom_server.domain.member.MemberPrivilege;
 import pl.mwasyluk.ouroom_server.domain.sendable.ChatSendable;
 import pl.mwasyluk.ouroom_server.domain.user.User;
+import pl.mwasyluk.ouroom_server.dto.notification.NotificationView;
 import pl.mwasyluk.ouroom_server.dto.sendable.SendableForm;
 import pl.mwasyluk.ouroom_server.dto.sendable.SendableView;
 import pl.mwasyluk.ouroom_server.exceptions.ServiceException;
 import pl.mwasyluk.ouroom_server.repos.SendableRepository;
 import pl.mwasyluk.ouroom_server.services.MemberValidator;
+import pl.mwasyluk.ouroom_server.websocket.NotificationTemplate;
+import pl.mwasyluk.ouroom_server.websocket.Topic;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
+import static pl.mwasyluk.ouroom_server.dto.notification.NotificationView.Action.CHANGED;
+import static pl.mwasyluk.ouroom_server.dto.notification.NotificationView.Action.NEW;
+import static pl.mwasyluk.ouroom_server.dto.notification.NotificationView.Action.REMOVED;
 import static pl.mwasyluk.ouroom_server.services.PrincipalValidator.validatePrincipal;
 
 @RequiredArgsConstructor
@@ -30,6 +36,12 @@ import static pl.mwasyluk.ouroom_server.services.PrincipalValidator.validatePrin
 public class DefaultSendableService implements SendableService {
     private final SendableRepository sendableRepo;
     private final MemberValidator memberValidator;
+    private final NotificationTemplate notificationTemplate;
+
+    private void notifyAllMembers(UUID membershipId, NotificationView.Action action, SendableView sendableView) {
+        NotificationView notificationView = new NotificationView(action, sendableView);
+        notificationTemplate.notifyAllMembers(membershipId, Topic.MESSAGES, notificationView);
+    }
 
     @Override
     public @NonNull Collection<SendableView> readAllFromContainer(@NonNull UUID containerId) {
@@ -58,7 +70,10 @@ public class DefaultSendableService implements SendableService {
         // execution
         ChatSendable targetSendable = new ChatSendable(principal, sendableForm.getMessage());
         targetSendable.setContainer(Chat.mockOf(sendableForm.getContainerId()));
-        return new SendableView(sendableRepo.save(targetSendable));
+
+        SendableView sendableView = new SendableView(sendableRepo.save(targetSendable));
+        notifyAllMembers(sendableForm.getContainerId(), NEW, sendableView);
+        return sendableView;
     }
 
     @Override
@@ -85,7 +100,9 @@ public class DefaultSendableService implements SendableService {
             throw new ServiceException(UNPROCESSABLE_ENTITY, "The new content cannot be applied to this Sendable.");
         }
 
-        return new SendableView(sendableRepo.save(targetSendable));
+        SendableView sendableView = new SendableView(sendableRepo.save(targetSendable));
+        notifyAllMembers(sendableForm.getContainerId(), CHANGED, sendableView);
+        return sendableView;
     }
 
     @Override
@@ -99,14 +116,12 @@ public class DefaultSendableService implements SendableService {
 
         // verification + execution
         ChatSendable targetSendable = optionalSendable.get();
-        if (targetSendable.getCreator().equals(principal)) {
-            sendableRepo.deleteById(sendableId);
-            return;
+        if (!targetSendable.getCreator().equals(principal)) {
+            memberValidator.validatePrivilegesAsMember(principal.getId(), targetSendable.getContainer().getId(),
+                    MemberPrivilege.DELETE_MESSAGES);
         }
 
-        // verification + execution
-        memberValidator.validatePrivilegesAsMember(principal.getId(), targetSendable.getContainer().getId(),
-                MemberPrivilege.DELETE_MESSAGES);
+        notifyAllMembers(targetSendable.getContainer().getId(), REMOVED, new SendableView(targetSendable));
         sendableRepo.deleteById(sendableId);
     }
 }
