@@ -1,12 +1,16 @@
 package pl.mwasyluk.ouroom_server.websocket;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.messaging.StompSubProtocolErrorHandler;
 import lombok.RequiredArgsConstructor;
+
+import pl.mwasyluk.ouroom_server.exceptions.WebSocketInterceptorException;
 
 @RequiredArgsConstructor
 
@@ -21,6 +25,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
+
+        registry.setErrorHandler(new StompSubProtocolErrorHandler() {
+            @Override
+            public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable e) {
+                if (e.getCause() instanceof WebSocketInterceptorException wse) {
+                    e = wse;
+                }
+                return super.handleClientMessageProcessingError(clientMessage, e);
+            }
+        });
     }
 
     @Override
