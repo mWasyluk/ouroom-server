@@ -1,4 +1,4 @@
-package pl.mwasyluk.ouroom_server.newdomain.container;
+package pl.mwasyluk.ouroom_server.domain.container;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,9 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import pl.mwasyluk.ouroom_server.newdomain.member.Member;
-import pl.mwasyluk.ouroom_server.newdomain.member.MemberPrivilege;
-import pl.mwasyluk.ouroom_server.newdomain.user.User;
+import pl.mwasyluk.ouroom_server.domain.member.Member;
+import pl.mwasyluk.ouroom_server.domain.member.MemberPrivilege;
+import pl.mwasyluk.ouroom_server.domain.user.User;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +28,7 @@ class ChatTest {
     private static final Set<MemberPrivilege> EMPTY_PRIVILEGES = Collections.emptySet();
     private static final Set<MemberPrivilege> SINGLE_PRIVILEGES = Set.of(MemberPrivilege.ADD_MESSAGES);
     private static final Set<MemberPrivilege> MULTI_PRIVILEGES
-            = Set.of(MemberPrivilege.ADD_MESSAGES, MemberPrivilege.REMOVE_MESSAGES);
+            = Set.of(MemberPrivilege.ADD_MESSAGES, MemberPrivilege.DELETE_MESSAGES);
     private static final Set<MemberPrivilege> ALL_PRIVILEGES = Set.of(MemberPrivilege.values());
     private static final Set<MemberPrivilege> INCOMPLETE_PRIVILEGES
             = ALL_PRIVILEGES.stream().skip(1).collect(Collectors.toSet());
@@ -96,7 +96,7 @@ class ChatTest {
             Set<MemberPrivilege> p2 = Set.of();
             Set<MemberPrivilege> p3 = Set.of(MemberPrivilege.MANAGE_MEMBERS);
             Set<MemberPrivilege> p4 = Set.of(MemberPrivilege.ADD_MESSAGES, MemberPrivilege.PIN_MESSAGES,
-                    MemberPrivilege.REMOVE_MESSAGES);
+                    MemberPrivilege.DELETE_MESSAGES);
             Set<MemberPrivilege> p5 = Chat.ADMIN_PRIVILEGES;
             Set<MemberPrivilege> p6 = Chat.DEFAULT_PRIVILEGES;
 
@@ -257,55 +257,6 @@ class ChatTest {
                 assertFalse(o1.isAdminByUserId(u1.getId()));
                 assertFalse(o1.isAdminByUserId(u2.getId()));
             });
-        }
-    }
-
-    @Nested
-    @DisplayName("hasAnyAdmin method")
-    class HasAnyAdminMethodTest {
-        @Test
-        @DisplayName("returns true when just initialized with null map")
-        void returnsTrueWhenJustInitializedWithNullMap() {
-            Chat o1 = newOf(null);
-
-            assertTrue(o1.hasAnyAdmin());
-        }
-
-        @Test
-        @DisplayName("returns false when main admin has been updated with incomplete privileges")
-        void returnsFalseWhenMainAdminHasBeenUpdatedWithIncompletePrivileges() {
-            Chat o1 = newOf(null);
-            o1.getMemberByUserId(MOCK_USER.getId()).get().setPrivileges(INCOMPLETE_PRIVILEGES);
-
-            assertFalse(o1.hasAnyAdmin());
-        }
-
-        @Test
-        @DisplayName("returns false when the only admin has been removed")
-        void returnsFalseWhenTheOnlyAdminHasBeenRemoved() {
-            Chat o1 = newOf(null);
-            o1.removeMemberByUserId(MOCK_USER.getId());
-
-            assertFalse(o1.hasAnyAdmin());
-        }
-
-        @Test
-        @DisplayName("returns true when main admin has been removed but other exists")
-        void returnsTrueWhenMainAdminHasBeenRemovedButOtherExists() {
-            Chat o1 = newOf(Map.of(newMockUser(), Chat.ADMIN_PRIVILEGES));
-            o1.removeMemberByUserId(MOCK_USER.getId());
-
-            assertTrue(o1.hasAnyAdmin());
-        }
-
-        @Test
-        @DisplayName("returns true when main admin has been removed but other added")
-        void returnsTrueWhenMainAdminHasBeenRemovedButOtherAdded() {
-            Chat o1 = newOf(null);
-            o1.removeMemberByUserId(MOCK_USER.getId());
-            o1.addMember(newMockUser(), Chat.ADMIN_PRIVILEGES);
-
-            assertTrue(o1.hasAnyAdmin());
         }
     }
 
