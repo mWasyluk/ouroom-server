@@ -31,8 +31,8 @@ public class UserProfile implements Presentable {
     private Image image;
 
     public UserProfile(ProfileBuilder profileBuilder) {
-        this.firstname = profileBuilder.firstname;
-        this.lastname = profileBuilder.lastname;
+        this.firstname = profileBuilder.firstname.trim();
+        this.lastname = profileBuilder.lastname.trim();
         this.image = profileBuilder.image;
     }
 
@@ -56,12 +56,12 @@ public class UserProfile implements Presentable {
         }
 
         public ProfileBuilder setFirstname(String firstname) {
-            this.firstname = firstname.trim();
+            this.firstname = firstname;
             return this;
         }
 
         public ProfileBuilder setLastname(String lastname) {
-            this.lastname = lastname.trim();
+            this.lastname = lastname;
             return this;
         }
 
@@ -71,7 +71,7 @@ public class UserProfile implements Presentable {
         }
 
         protected void validate() {
-            if (firstname == null || firstname.isBlank() && lastname == null || lastname.isBlank()) {
+            if (firstname == null || firstname.isBlank() || lastname == null || lastname.isBlank()) {
                 throw new InitializationException("User names are invalid: '" + firstname + " " + lastname + "'");
             }
             target.profile = new UserProfile(this);

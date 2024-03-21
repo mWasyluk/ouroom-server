@@ -47,9 +47,9 @@ public class UserAccount {
     private boolean enabled;
 
     private UserAccount(AccountBuilder accountBuilder) {
-        this.username = accountBuilder.username;
-        this.password = accountBuilder.password;
-        this.authorities = accountBuilder.authorities;
+        this.username = accountBuilder.username.trim();
+        this.password = accountBuilder.password.trim();
+        this.authorities = EnumSet.copyOf(accountBuilder.authorities);
         this.accountNonExpired = accountBuilder.accountNonExpired;
         this.accountNonLocked = accountBuilder.accountNonLocked;
         this.credentialsNonExpired = accountBuilder.credentialsNonExpired;
@@ -65,7 +65,7 @@ public class UserAccount {
         private String username;
         private String password;
         private AuthProvider provider;
-        private EnumSet<UserAuthority> authorities;
+        private Set<UserAuthority> authorities;
         private boolean accountNonExpired;
         private boolean accountNonLocked;
         private boolean credentialsNonExpired;
@@ -86,12 +86,12 @@ public class UserAccount {
         }
 
         public AccountBuilder setUsername(String username) {
-            this.username = username.trim();
+            this.username = username;
             return this;
         }
 
         public AccountBuilder setPassword(String password) {
-            this.password = password.trim();
+            this.password = password;
             return this;
         }
 
@@ -101,7 +101,7 @@ public class UserAccount {
         }
 
         public AccountBuilder setAuthorities(Set<UserAuthority> authorities) {
-            this.authorities = EnumSet.copyOf(authorities);
+            this.authorities = authorities;
             return this;
         }
 
@@ -131,6 +131,12 @@ public class UserAccount {
             }
             if ((password == null || password.isBlank()) && provider == AuthProvider.LOCAL) {
                 throw new InitializationException("Password cannot be empty for a local user.");
+            }
+            if (authorities == null || authorities.isEmpty()) {
+                throw new InitializationException("Authorities cannot be empty or contain null");
+            }
+            if (provider == null) {
+                throw new InitializationException("Provider cannot be null");
             }
             target.account = new UserAccount(this);
         }
