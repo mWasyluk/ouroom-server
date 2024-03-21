@@ -21,9 +21,10 @@ public class Video extends Media {
 
     @Override
     protected void validate() {
-        if (!MediaUtil.isVideoType(getDataSource().getContentType())) {
+        String contentType = getDataSource().getContentType();
+        if (contentType == null || !MediaUtil.isVideoType(contentType)) {
             throw new InitializationException(
-                    "Cannot instantiate Video object with " + this.getType() + " media type.");
+                    "Cannot instantiate Video object with " + contentType + " media type.");
         }
     }
 }

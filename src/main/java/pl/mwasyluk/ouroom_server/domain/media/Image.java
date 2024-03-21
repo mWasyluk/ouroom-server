@@ -21,9 +21,10 @@ public class Image extends Media {
 
     @Override
     protected void validate() {
-        if (!MediaUtil.isImageType(getDataSource().getContentType())) {
+        String contentType = getDataSource().getContentType();
+        if (contentType == null || !MediaUtil.isImageType(contentType)) {
             throw new InitializationException(
-                    "Cannot instantiate Image object with " + this.getType() + " media type.");
+                    "Cannot instantiate Image object with " + contentType + " media type.");
         }
     }
 }
