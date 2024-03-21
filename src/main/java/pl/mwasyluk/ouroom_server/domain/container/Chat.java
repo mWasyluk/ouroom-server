@@ -87,13 +87,11 @@ public class Chat extends BaseConversation {
 
     public Chat(@NonNull User owner, Map<User, Set<MemberPrivilege>> memberUserPrivilegesMap) {
         this(owner);
-        Map<User, Set<MemberPrivilege>> targetMap = memberUserPrivilegesMap;
-        if (targetMap == null) {
-            targetMap = new HashMap<>();
-        } else {
+        if (memberUserPrivilegesMap != null) {
+            Map<User, Set<MemberPrivilege>> targetMap = new HashMap<>(memberUserPrivilegesMap);
             targetMap.remove(owner);
+            targetMap.forEach((user, privs) -> members.add(memberFactory.create(user, privs)));
         }
-        targetMap.forEach((user, privs) -> members.add(memberFactory.create(user, privs)));
     }
 
     private boolean hasAdminPrivileges(@NonNull Member member) {
