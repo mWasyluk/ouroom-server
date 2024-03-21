@@ -46,7 +46,7 @@ public abstract class BaseSendable extends Identifiable implements Sendable {
     @Setter(AccessLevel.PROTECTED)
     protected boolean edited;
 
-    protected BaseSendable(@NonNull User creator, @NonNull String message) {
+    protected BaseSendable(@NonNull User creator, String message) {
         initMessage(message);
         this.creator = creator;
         this.createdAt = ZonedDateTime.now();
@@ -54,28 +54,4 @@ public abstract class BaseSendable extends Identifiable implements Sendable {
     }
 
     abstract protected void initMessage(String message);
-
-    @Override
-    public boolean updateState(@NonNull SendableState newState) {
-        if (newState.ordinal() < this.state.ordinal()) {
-            return false;
-        }
-        this.state = newState;
-        return true;
-    }
-
-    @Override
-    public boolean updateMessage(@NonNull String newMessage) {
-        if (newMessage.isBlank()) {
-            return false;
-        }
-        String trimmed = newMessage.trim();
-        if (this.message.equals(trimmed)) {
-            return true;
-        }
-
-        this.message = trimmed;
-        this.edited = true;
-        return true;
-    }
 }

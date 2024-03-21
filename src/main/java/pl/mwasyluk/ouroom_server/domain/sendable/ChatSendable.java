@@ -25,7 +25,7 @@ public class ChatSendable extends BaseSendable {
     @ManyToOne(targetEntity = Chat.class)
     protected SendablesContainer container;
 
-    public ChatSendable(@NonNull User creator, @NonNull String message) {
+    public ChatSendable(@NonNull User creator, String message) {
         super(creator, message);
     }
 
@@ -35,6 +35,30 @@ public class ChatSendable extends BaseSendable {
             throw new InitializationException("Cannot initialize ChatSendable with an empty message.");
         }
         this.message = message.trim();
+    }
+
+    @Override
+    public boolean updateState(@NonNull SendableState newState) {
+        if (newState.ordinal() < this.state.ordinal()) {
+            return false;
+        }
+        this.state = newState;
+        return true;
+    }
+
+    @Override
+    public boolean updateMessage(String newMessage) {
+        if (newMessage == null || newMessage.isBlank()) {
+            return false;
+        }
+        String trimmed = newMessage.trim();
+        if (this.message.equals(trimmed)) {
+            return true;
+        }
+
+        this.message = trimmed;
+        this.edited = true;
+        return true;
     }
 
     @Override
