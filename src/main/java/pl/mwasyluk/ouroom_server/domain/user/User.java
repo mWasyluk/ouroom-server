@@ -63,7 +63,8 @@ public class User extends Identifiable implements UserDetails, Presentable {
                 .setAccountNonExpired(true)
                 .setAccountNonLocked(true)
                 .setCredentialsNonExpired(true)
-                .setEnabled(false)
+                // TODO: provide blockages mechanism and disabling by default until creating a profile
+                .setEnabled(true)
                 .apply();
     }
 
