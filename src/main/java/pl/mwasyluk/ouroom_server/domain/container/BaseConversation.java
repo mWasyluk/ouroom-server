@@ -18,4 +18,12 @@ public abstract class BaseConversation extends Identifiable implements Conversat
     private String name;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private Image image;
+
+    public void setName(String name) {
+        if (name == null || name.isBlank()) {
+            this.name = null;
+        } else {
+            this.name = name.trim();
+        }
+    }
 }
