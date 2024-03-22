@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.lang.Nullable;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.NonNull;
@@ -29,8 +28,8 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import static pl.mwasyluk.ouroom_server.services.PrincipalValidator.validatePrincipal;
-import static pl.mwasyluk.ouroom_server.utils.BcryptUtils.BCRYPT_PATTERN;
 import static pl.mwasyluk.ouroom_server.utils.BcryptUtils.BCRYPT_PREFIX;
+import static pl.mwasyluk.ouroom_server.utils.BcryptUtils.isBcryptWithPrefix;
 
 @RequiredArgsConstructor
 
@@ -39,7 +38,7 @@ public class DefaultUserService implements UserService {
     private final UserRepository userRepo;
 
     private void verifyPassword(String password) {
-        if (!BCRYPT_PATTERN.matcher(password).matches()) {
+        if (!isBcryptWithPrefix(password)) {
             throw new ServiceException(UNPROCESSABLE_ENTITY,
                     "Requires password hashed via BCrypt algorithm and prefixed with '" + BCRYPT_PREFIX + "'.");
         }
