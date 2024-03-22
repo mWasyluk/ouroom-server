@@ -107,10 +107,11 @@ public class DefaultChatService implements ChatService {
     @Override
     public @NonNull ChatPresentableView update(@NonNull ChatForm chatForm) {
         // validation
-        Member member = memberValidator.validateAsMember(validatePrincipal().getId(), chatForm.getChatId());
+        UUID principalId = validatePrincipal().getId();
         if (chatForm.getChatId() == null) {
             throw new ServiceException(UNPROCESSABLE_ENTITY, "Updating Chat requires a chat ID.");
         }
+        Member member = memberValidator.validateAsMember(principalId, chatForm.getChatId());
 
         // verification
         boolean canManageDetails = member.getPrivileges().contains(MemberPrivilege.MANAGE_DETAILS);
