@@ -52,7 +52,7 @@ import static pl.mwasyluk.ouroom_server.mocks.WithUserDetailsSecurityContextFact
 @SpringJUnitConfig
 public class DefaultUserServiceTest {
     private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
+
     @Mock
     private UserRepository userRepository;
     private DefaultUserService defaultUserService;
@@ -493,9 +493,8 @@ public class DefaultUserServiceTest {
             User principal = pullPrincipalUser();
             principal.profileBuilder().setFirstname("Firstname").setLastname("Lastname").setImage(mockImage).apply();
 
-            Image mockImage2 = (Image) Media.of(DataSource.of(DataSourceTestUtil.PNG_BYTES));
             MockMultipartFile mockImageFile2 =
-                    new MockMultipartFile("mock_image.png", mockImage2.getSource().getData());
+                    new MockMultipartFile("mock_image.png", DataSourceTestUtil.PNG_BYTES);
 
             UserPresentableForm form = new UserPresentableForm();
             form.setClearImage(false);
@@ -508,7 +507,7 @@ public class DefaultUserServiceTest {
                 ArgumentCaptor<User> argument = ArgumentCaptor.forClass(User.class);
                 verify(userRepository).save(argument.capture());
                 assertEquals("Firstname Lastname", argument.getValue().getName());
-                assertArrayEquals(mockImage2.getSource().getData(),
+                assertArrayEquals(DataSourceTestUtil.PNG_BYTES,
                         argument.getValue().getImage().getDataSource().getData());
             });
         }
