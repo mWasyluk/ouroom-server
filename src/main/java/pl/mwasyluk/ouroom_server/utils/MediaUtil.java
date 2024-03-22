@@ -15,8 +15,8 @@ public class MediaUtil {
             MediaType.IMAGE_GIF
     );
     public static final Set<MediaType> SUPPORTED_VIDEO_TYPES = Set.of(
-            VideoMediaType.MP4,
-            VideoMediaType.MPEG
+            VideoMediaType.VIDEO_MP4,
+            VideoMediaType.VIDEO_MPEG
     );
     public static final Set<MediaType> SUPPORTED_MEDIA_TYPES = new HashSet<>() {{
         addAll(SUPPORTED_IMAGE_TYPES);
