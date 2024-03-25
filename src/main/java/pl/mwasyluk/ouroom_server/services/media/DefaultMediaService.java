@@ -1,6 +1,5 @@
 package pl.mwasyluk.ouroom_server.services.media;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,14 +47,14 @@ public class DefaultMediaService implements MediaService {
         }
 
         // verification
-        DataSource dataSource;
+        Media result;
         try {
-            dataSource = DataSource.of(file.getBytes());
-        } catch (IOException e) {
-            throw new ServiceException(UNPROCESSABLE_ENTITY, "The file byte array could not be read.");
+            result = Media.of(DataSource.of(file.getBytes()));
+        } catch (Exception e) {
+            throw new ServiceException(UNPROCESSABLE_ENTITY, "The file's byte array is not a valid media content.");
         }
 
         // execution
-        return mediaRepository.save(Media.of(dataSource));
+        return mediaRepository.save(result);
     }
 }
