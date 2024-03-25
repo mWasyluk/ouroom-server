@@ -12,14 +12,20 @@ import pl.mwasyluk.ouroom_server.domain.user.User;
 import pl.mwasyluk.ouroom_server.domain.user.UserAuthority;
 
 public class MockUserDetailsService implements UserDetailsService {
+    public static final String USER = "user";
+    public static final String ADMIN = "admin";
+    public static final String ADMIN_USER = "admin-user";
+
     private final Map<String, User> userMap = new HashMap<>();
 
     public MockUserDetailsService() {
-        User user = new User("user", "pass", Set.of(UserAuthority.USER));
-        User admin = new User("admin", "pass", Set.of(UserAuthority.ADMIN, UserAuthority.USER));
-        
+        User user = new User(USER, "pass", Set.of(UserAuthority.USER));
+        User admin = new User(ADMIN, "pass", Set.of(UserAuthority.ADMIN));
+        User adminUser = new User(ADMIN_USER, "pass", Set.of(UserAuthority.ADMIN, UserAuthority.USER));
+
         userMap.put(user.getUsername(), user);
         userMap.put(admin.getUsername(), admin);
+        userMap.put(adminUser.getUsername(), adminUser);
     }
 
     @Override
