@@ -101,7 +101,7 @@ public class DefaultSendableService implements SendableService {
         }
 
         SendableView sendableView = new SendableView(sendableRepo.save(targetSendable));
-        notifyAllMembers(sendableForm.getContainerId(), CHANGED, sendableView);
+        notifyAllMembers(targetSendable.getContainer().getId(), CHANGED, sendableView);
         return sendableView;
     }
 
