@@ -20,6 +20,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             """)
     int countAllByIdIn(Set<UUID> userIdSet);
     default boolean allExistByIdIn(Set<UUID> userIdSet) {
+        if (userIdSet == null || userIdSet.isEmpty()) {
+            return true;
+        }
         return countAllByIdIn(userIdSet) == userIdSet.size();
     }
 
