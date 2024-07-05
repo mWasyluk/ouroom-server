@@ -1,27 +1,30 @@
-# Work in progress!
+# 🚧 Work in progress!
 
-# Messenger API
+# 📱 Messenger API
 
-## About
-The Messenger API is a REST API that provides endpoints which are used to perform CRUD operations on chat users and theirs messages.
+## 📖 About
+The Messenger API is a REST API that provides endpoints which are used to perform CRUD operations on chat users and their messages.
 
-## Available endpoint
-The API provides endpoints that are handful to reach the expected resoult. Those are:
-* [Accounts](https://github.com/mWasyluk/spring-boot_messenger-api/blob/account-registration/src/main/java/pl/wasyluva/spring_messengerapi/web/controller/AccountController.java)
-  * GET - /accounts - returns all persisted Accounts (insecure)
-  * POST - /accounts/register - registers a new Account
-* [Profiles](https://github.com/mWasyluk/spring-boot_messenger-api/blob/main/src/main/java/pl/wasyluva/spring_messengerapi/web/controller/UserProfileController.java)
-  * GET - /profiles - returns all persisted Profiles (insecure)
-  * GET - /profiles/{userUUID} - returns a Profile with the given UUID
-  * POST - /profiles/create - creates a new Profile and assigns it to the Account
-  * PATCH - /profiles/update - updates the Profile
-* [Messages](https://github.com/mWasyluk/spring-boot_messenger-api/blob/main/src/main/java/pl/wasyluva/spring_messengerapi/web/controller/MessageController.java)
-  * GET - /messages - returns all persisted Messages (insecure)
-  * POST - /messages/send/{userUUID} - persists a new Message
-  * PATCH - /messages/update - updates the Message
-  * DELETE - /delete/{messageUUID} - deletes the Message
-  
-## Contents
+## 🛠️ Available Endpoints
+The API provides endpoints that are handy to reach the expected result. Those are:
+
+### 👤 [Accounts](https://github.com/mWasyluk/spring-boot_messenger-api/blob/account-registration/src/main/java/pl/wasyluva/spring_messengerapi/web/controller/AccountController.java)
+* GET - `/accounts` - returns all persisted Accounts (insecure)
+* POST - `/accounts/register` - registers a new Account
+
+### 👥 [Profiles](https://github.com/mWasyluk/spring-boot_messenger-api/blob/main/src/main/java/pl/wasyluva/spring_messengerapi/web/controller/UserProfileController.java)
+* GET - `/profiles` - returns all persisted Profiles (insecure)
+* GET - `/profiles/{userUUID}` - returns a Profile with the given UUID
+* POST - `/profiles/create` - creates a new Profile and assigns it to the Account
+* PATCH - `/profiles/update` - updates the Profile
+
+### 💬 [Messages](https://github.com/mWasyluk/spring-boot_messenger-api/blob/main/src/main/java/pl/wasyluva/spring_messengerapi/web/controller/MessageController.java)
+* GET - `/messages` - returns all persisted Messages (insecure)
+* POST - `/messages/send/{userUUID}` - persists a new Message
+* PATCH - `/messages/update` - updates the Message
+* DELETE - `/delete/{messageUUID}` - deletes the Message
+
+## 📁 Project Structure
 Following links will help you to look around interesting parts of the project in a snap:
 * [Properties](https://github.com/mWasyluk/spring-boot_messenger-api/blob/main/src/main/resources/application.properties)
 * [Source code](https://github.com/mWasyluk/spring-boot_messenger-api/tree/main/src/main/java/pl/wasyluva/spring_messengerapi)
@@ -31,7 +34,7 @@ Following links will help you to look around interesting parts of the project in
   * [Web](https://github.com/mWasyluk/spring-boot_messenger-api/tree/main/src/main/java/pl/wasyluva/spring_messengerapi/web)
 * [Tests](https://github.com/mWasyluk/spring-boot_messenger-api/tree/main/src/test/java/pl/wasyluva/spring_messengerapi)
 
-## Dependencies
+## 📚 Dependencies
 The dependencies used to build and run the project are:
 * [Spring](https://spring.io/projects)*
   * [Spring Framework](https://docs.spring.io/spring-framework/docs/current/reference/html/)*
@@ -45,4 +48,23 @@ The dependencies used to build and run the project are:
 * [Lombok](https://projectlombok.org/features/)*
 * [PostgreSQL](https://jdbc.postgresql.org/documentation/use/)*
 
-\* -<em> link to external website</em>
+\* - *link to external website*
+
+## 🚀 Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/mWasyluk/ouroom-server.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd ouroom-server
+   ```
+3. Build the project:
+   ```bash
+   ./mvnw clean install
+   ```
+4. Run the application:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
